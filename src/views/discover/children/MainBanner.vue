@@ -103,19 +103,21 @@ export default {
 .main-banner {
   width: 100%;
   height: 146px;
-  
-  .swiper-wrapper {
-    width: 100%;
-    height: 100%;
+}
+.swiper-wrapper {
+  width: 100%;
+  height: 100%;
 
-    .swiper-slide {
+  .swiper-slide {
+    height: 100%;
+    // overflow: hidden;// 弹性布局的盒子使用overflow
+    box-shadow: 0 1px 1px #ccc;
+    img {
       height: 100%;
-      // overflow: hidden;// 弹性布局的盒子使用overflow
-      box-shadow: 0 1px 1px #ccc;
-      img {
-        height: 100%;
-      }
     }
   }
 }
+// .swiper-slide-active {
+//   transform: scale(1.1); 
+// }
 </style>

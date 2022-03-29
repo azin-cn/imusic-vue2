@@ -2,7 +2,7 @@
   <div class="official-playlist">
     <slide-play-list v-if="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST"
       :SLIDE_PLAYLIST_DATA="HOMEPAGE_BLOCK_OFFICIAL_PLAYLIST"
-      :SWIPER_INDEX="1">
+      :SLIDE_PLAYLIST_SWIPER_INDEX="1">
     </slide-play-list>
   </div>
 </template>

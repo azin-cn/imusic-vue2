@@ -11,12 +11,12 @@
 
       <div class="right">
         <div @click="more" class="nav-right">
-          <div>{{button_test}}<span class="iconfont icon-arrow2"></span></div>
+          <div>{{button_text}}<span class="iconfont icon-arrow2"></span></div>
         </div>
       </div>
     </div>
     
-    <div :class="'slide-play-list '+'swiper-containe '+'SWIPER_INDEX_'+SWIPER_INDEX" >
+    <div :class="'slide-play-list '+'SLIDE_PLAYLIST_SWIPER_INDEX_'+SLIDE_PLAYLIST_SWIPER_INDEX" >
       <div class="swiper-wrapper">
         <slide-play-list-item 
           v-for="(creative,index) in creatives"
@@ -56,7 +56,7 @@ export default {
         return {}
       }
     },
-    SWIPER_INDEX: {
+    SLIDE_PLAYLIST_SWIPER_INDEX: {
       type: Number,
       default: 0
     }
@@ -65,7 +65,7 @@ export default {
     nav_title() {
       return this.SLIDE_PLAYLIST_DATA.uiElement.subTitle.title
     },
-    button_test(){
+    button_text(){
       return this.SLIDE_PLAYLIST_DATA.uiElement.button.text
     },
     creatives() {
@@ -84,7 +84,7 @@ export default {
     /* banner 初始化模块 */
     initSwiper() {
       this.swiper = new Swiper(
-        document.querySelector('.SWIPER_INDEX_' + this.SWIPER_INDEX), {
+        document.querySelector('.SLIDE_PLAYLIST_SWIPER_INDEX_' + this.SLIDE_PLAYLIST_SWIPER_INDEX), {
         slidesPerView: 3,
         freeMode: true,
         speed: 800,
