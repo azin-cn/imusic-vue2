@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <nav-bar></nav-bar>
-    <router-view/>
+    <keep-alive exclude="{}">
+      <router-view/>
+    </keep-alive>
   </div>
 </template>
 
@@ -18,5 +20,5 @@ export default {
 </script>
 
 <style lang="less">
-
+@import url('https://at.alicdn.com/t/font_3280963_buadsssyrh.css');
 </style>

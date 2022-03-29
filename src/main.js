@@ -5,7 +5,9 @@ import store from './store'
 
 Vue.config.productionTip = false
 
-import 'assets/icon/discover/iconfont.css'
+import 'assets/css/base.css'
+
+// import 'assets/icon/discover/iconfont.css'
 
 new Vue({
   router,

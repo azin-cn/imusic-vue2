@@ -72,7 +72,7 @@ export default {
   text-align: center;
 
   .title {
-    padding: 0 1.1994vh;
+    padding: 0 1.6vw;
     transition: .2s; // 添加延时动态变化
   }
 }

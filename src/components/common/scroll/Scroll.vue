@@ -1,11 +1,19 @@
 <template>
   <div ref="wrapper" class="wrapper">
+    <!-- 注意：better-scroll默认会将wrapper和content对齐
+          所以在使用的时候在content内
+          如果有margin或者是padding的化的第一个元素进行调整
+          调整为和margin或者padding一样的值就可以了
+     -->
+
     <slot name="content"></slot>
   </div>
 </template>
 
 <script>
 import {debounce} from './debounce'
+
+import Vue from 'vue'
 
 // BScroll 配置区域
 import BScroll from "@better-scroll/core";
@@ -25,6 +33,7 @@ export default {
   mounted() {
     this.initScroll();
     this.bscroll.refresh();
+    Vue.prototype.$bscroll = this.bscroll
   },
   methods: {
     initScroll() {
@@ -39,12 +48,16 @@ export default {
 
         // 插件
         pullUpLoad: true,
-        pullDownRefresh: true
+        pullDownRefresh: true,
+        preventDefaultException: {
+          className: /(^|\s)test(\s|$)/
+        }
       });
       // 在监听了下拉加载更多以后,监听是否结束了滑动,或者是用户的手指是否离开了页面(正确操作),等待完成了以后再执行释放finishPullUp的操作. 先进性刷新操作,等待手指离开后进行释放上拉
       this.bscroll.on("pullingUp", () => {
         this.bscroll.refresh();
         this.bscroll.on("touchEnd", () => {
+          this.$emit('pullingUp')
           console.log("++++++++++++++touchEnd++++++++++++++");
           this.bscroll.finishPullUp();
         });

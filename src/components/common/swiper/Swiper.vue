@@ -36,6 +36,7 @@ export default {
     this.initSwiper()
   },
   methods: {
+    // 必须要在数据之后才能初始化。
     initSwiper() {
       this.swiper = new SwiperA(
         this.$refs['swiperRef'], {
