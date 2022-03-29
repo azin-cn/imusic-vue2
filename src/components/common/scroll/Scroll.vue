@@ -1,12 +1,11 @@
 <template>
   <div ref="wrapper" class="wrapper">
-    <!-- 注意：better-scroll默认会将wrapper和content对齐
-          所以在使用的时候在content内
-          如果有margin或者是padding的化的第一个元素进行调整
-          调整为和margin或者padding一样的值就可以了
-     -->
-
     <slot name="content"></slot>
+      <!-- 注意：better-scroll默认会将wrapper和content对齐
+        所以在使用的时候在content内
+        如果有margin或者是padding的化的第一个元素进行调整
+        调整为和margin或者padding一样的值就可以了 
+      -->
   </div>
 </template>
 
