@@ -1,14 +1,72 @@
 
 import {
-  REC_DISCOVERD_DATA
+  REC_DISCOVERD_DATA,
+  REC_DISCOVERD_DATA_SLIDE_BALL,
+  REC_DISCOVERD_DATA_LATEST_MV
 } from './mutations_type'
 
 import { 
   reqDiscoverData,
-  reqSlideBall
+  reqSlideBall,
+  reqLatestMV
  } from 'api/discover'
 
+
 export const actions = {
+  /**
+   * getLatestMV 获取最新的MV
+   * @returns MV列表
+   */
+  async getLatestMV({commit}) {
+    let resp = await reqLatestMV()
+    if(resp.code !== 200) {
+      console.log(resp);
+      return null;
+    }
+    let HOMEPAGE_BLOCK_LATEST_MV = {
+      uiElement: {
+        subTitle: {},
+        button: {}
+      },
+      creatives: []
+    }
+    HOMEPAGE_BLOCK_LATEST_MV.uiElement.subTitle.title = '最新MV'
+    HOMEPAGE_BLOCK_LATEST_MV.uiElement.button.text = '更多'
+
+    let creatives = []
+    resp.data.forEach((item) => {
+      let resources = []
+      let resource = {
+        uiElement: {
+          mainTitle:{},
+          image: {}
+        }
+      }
+      resource.resourceId = item.id
+      resource.uiElement.mainTitle.title = item.name
+      resource.uiElement.image.imageUrl = item.cover
+      resources.push(resource)
+      creatives.push({
+        resources
+      })
+    })
+    HOMEPAGE_BLOCK_LATEST_MV.creatives = creatives
+    commit(REC_DISCOVERD_DATA_LATEST_MV,{HOMEPAGE_BLOCK_LATEST_MV})
+  },
+
+  /**
+   * getSlideBall 获取原型图标
+   * @returns 获取原型图标
+   */
+  async getSlideBall({commit}) {
+    let resp = await reqSlideBall()
+    if(resp.code !== 200) {
+      console.log(resp);
+      return null
+    }
+    let HOMEPAGE_SLIDE_BALL = resp.data
+    commit(REC_DISCOVERD_DATA_SLIDE_BALL,{HOMEPAGE_SLIDE_BALL})
+  },
   
   /**
    * getDisCoverData 获取首页（发现页）的数据
@@ -17,15 +75,12 @@ export const actions = {
    */
   async getDisCoverData({commit}) {
     let resp = await reqDiscoverData()
-    let slideBall = await reqSlideBall()
-    
-    if(resp.code !== 200 || slideBall.code !== 200) {
+    if(resp.code !== 200) {
       console.log(resp); // 打印错误信息
       return // 推出函数
     }
-
+    
     let data = resp.data.blocks
-    data.push(slideBall.data) // 处理数据
 
     let payload = []
     let tags = [
@@ -42,8 +97,6 @@ export const actions = {
       'HOMEPAGE_BLOCK_YUNCUN_PRODUCED',
       'HOMEPAGE_PODCAST24',
       'HOMEPAGE_BLOCK_VIDEO_PLAYLIST',
-
-      'HOMEPAGE_SLIDE_BALL', // 滑动图形入口处
     ]
     
     // 进行数据处理，方便以后的维护
@@ -51,7 +104,8 @@ export const actions = {
     //   payload.push(item)
     // });
     payload.push(data[0].extInfo.banners)
-    data.forEach( (item, index) => {
+
+    data.forEach( (item, index) => { // foreach无法终结
       if(index==0) return
       payload.push(item)
     });

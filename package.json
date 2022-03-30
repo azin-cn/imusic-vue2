@@ -13,7 +13,6 @@
     "@better-scroll/pull-up": "^2.4.2",
     "axios": "^0.26.1",
     "core-js": "^3.8.3",
-    "cube-ui": "~1.12.15",
     "swiper": "^4.5.1",
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",

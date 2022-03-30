@@ -26,16 +26,36 @@ export function reqMainBanner(type) {
  */
 export function reqSlideBall() {
  return request({
-  url: 'homepage/dragon/ball/'
+  url: '/homepage/dragon/ball'
  })
 }
+
 
 /**
  * reqDiscoverData 获取首页（发现页）的数据
  * @returns 发现页数据
  */
-export function reqDiscoverData() {
+ export function reqDiscoverData() {
   return request({
-    url: 'homepage/block/page/'
+    url: '/homepage/block/page'
   })
 }
+
+/**
+ * reqLatestMV 获取最新 mv
+ * @type GET
+ * @param {String} area 地区，不填则为全部
+ * @param {Number} limit 取出数量 , 默认为 30
+ * @returns 最新 mv列表
+ */
+export function reqLatestMV(area,limit) {
+  return request({
+    url: '/mv/first',
+    params: {
+      limit: 6
+    }
+  })
+}
+
+
+

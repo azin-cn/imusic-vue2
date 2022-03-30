@@ -30,7 +30,7 @@ export default {
   span,div{
     width: 105px;
     margin-top: 6px;
-    padding: 0 1px;
+    padding: 0 2px;
     font-size: 14px;
     font-weight: 600;
     line-height: 1.4;

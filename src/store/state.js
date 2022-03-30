@@ -15,5 +15,6 @@ export const state = {
     HOMEPAGE_BLOCK_VIDEO_PLAYLIST:null,
 
     HOMEPAGE_SLIDE_BALL: null,
+    HOMEPAGE_BLOCK_LATEST_MV: null
   }
 }

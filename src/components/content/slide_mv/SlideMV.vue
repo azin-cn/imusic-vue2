@@ -1,5 +1,5 @@
 <template>
-  <div class="slide-playlist">
+    <div class="slide-mv">
     <div class="nav-bar">
       <div class="left">
         <h3>{{nav_title}}</h3>
@@ -15,100 +15,89 @@
         </div>
       </div>
     </div>
-    
-    <div :class="'slide-play-list '+'SLIDE_PLAYLIST_SWIPER_INDEX_'+SLIDE_PLAYLIST_SWIPER_INDEX" >
+
+    <div :class="'swiper-mv  '+'SLIDE_MV_SWIPER_INDEX_' + SLIDE_MV_SWIPER_INDEX" >
       <div class="swiper-wrapper">
-        <slide-play-list-item 
+        <div class="swiper-slide slide-mv-item"
           v-for="(creative,index) in creatives"
           :key="index"
-          slot="slot-slide-play-list"
+          @click="itemClick(creative.resources[0].resourceId)"
         >
-          <img :src="creative.uiElement.image.imageUrl" alt="">
-          <span>{{creative.uiElement.mainTitle.title}}</span>
-        </slide-play-list-item>
+          <img :src="creative.resources[0].uiElement.image.imageUrl" alt="">
+          <span>{{creative.resources[0].uiElement.mainTitle.title}}</span>
+        </div>
       </div>
     </div>
 
   </div>
 </template>
 
+
 <script>
 
 import Swiper from 'swiper';
 import 'swiper/dist/css/swiper.min.css'
 
-import SlidePlayListItem from 'components/content/slide_playlist/SlidePlayListItem'
-
 export default {
-  name: 'SlidePlayList',
-  components: {
-    SlidePlayListItem
-  },
+  name: 'SlideMV',
   data() {
-    return {
+    return{
       swiper: null
     }
   },
   props: {
-    SLIDE_PLAYLIST_DATA: {
+    SLIDE_MV_DATA: {
       type: Object,
       default() {
         return {}
       }
     },
-    SLIDE_PLAYLIST_SWIPER_INDEX: {
+    SLIDE_MV_SWIPER_INDEX: {
       type: Number,
       default: 0
     }
   },
   computed: {
     nav_title() {
-      return this.SLIDE_PLAYLIST_DATA.uiElement.subTitle.title
+      return this.SLIDE_MV_DATA.uiElement.subTitle.title
     },
-    button_text(){
-      return this.SLIDE_PLAYLIST_DATA.uiElement.button.text
+    button_text() {
+      return this.SLIDE_MV_DATA.uiElement.button.text
     },
     creatives() {
-      return this.SLIDE_PLAYLIST_DATA.creatives
-    },
-    resources() {
-      return this.creatives.resources
+      return this.SLIDE_MV_DATA.creatives
     }
   },
   mounted() {
-    this.$nextTick( () => {
-      this.initSwiper() // 等待数据请求完成
+    this.$nextTick(() => {
+      this.initSwiper()  //最后才是初始化模块，先要有数据
     })
   },
   methods: {
     /* banner 初始化模块 */
     initSwiper() {
       this.swiper = new Swiper(
-        document.querySelector('.SLIDE_PLAYLIST_SWIPER_INDEX_' + this.SLIDE_PLAYLIST_SWIPER_INDEX), {
-        slidesPerView: 3,
+        document.querySelector('.SLIDE_MV_SWIPER_INDEX_'+this.SLIDE_MV_SWIPER_INDEX), {
+        slidesPerView: 2,
+        spaceBetween: 0,
         freeMode: true,
-        speed: 800,
         roundLengths: true,  // 长度取整
       })
     },
-    more() {
-
+    more() {},
+    itemClick(resourceId) {
+      console.log(resourceId);
     }
   }
-
 }
 </script>
 
+
 <style lang="less" scoped>
-.slide-playlist {
+.slide-mv {
   height: 220px;
-  // background-color: pink;
-
-  border-bottom: 8px solid rgba(200, 200, 200, .2);
-
-  border-radius: 12px;
+  border-bottom: 8px solid rgba(210, 210, 210, .2);
 }
-
 .nav-bar {
   display: flex;
   width: 100%;
@@ -117,6 +106,7 @@ export default {
   // background-color: skyblue;
   text-align: center;
   line-height: 56px;
+
   .left,
   .right {
     display: flex;
@@ -149,4 +139,31 @@ export default {
   }
 }
 
+.slide-mv-item {
+  display: flex;  
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  img {
+    width: 160px;
+    height: 105px;
+    border-radius: 12px;
+  }
+  span {
+    width: 160px;
+    margin-top: 6px;
+    padding: 0 2px;
+    line-height: 1.4;
+    font-weight: 600;
+    font-size: 14px;
+
+    // 两行省略显式点
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
 </style>

@@ -44,9 +44,11 @@ export default {
         momentumLimitTime: 400,
         eventPassthrough: "horizontal",
         probeType: 3, // 开启发送事件
-
+        bindToWrapper: true,
         // 插件
-        pullUpLoad: true,
+        pullUpLoad: {
+          threshold: -58 // 降低上拉的阈值
+        },
         pullDownRefresh: true,
         preventDefaultException: {
           className: /(^|\s)test(\s|$)/
@@ -54,19 +56,24 @@ export default {
       });
       // 在监听了下拉加载更多以后,监听是否结束了滑动,或者是用户的手指是否离开了页面(正确操作),等待完成了以后再执行释放finishPullUp的操作. 先进性刷新操作,等待手指离开后进行释放上拉
       this.bscroll.on("pullingUp", () => {
+        this.finishUp()
         this.bscroll.refresh();
-        this.bscroll.on("touchEnd", () => {
-          this.$emit('pullingUp')
-          console.log("++++++++++++++touchEnd++++++++++++++");
-          this.bscroll.finishPullUp();
-        });
-      });
+        // this.bscroll.on("touchEnd", () => {
+        //   // this.finishUp()
+        //   console.log(this);
+        // });
+      })
 
       this.bscroll.on('pullingDown',() => { // 下拉
         location.reload()
         this.bscroll.finishPullDown()
       })
     },
+    finishUp: debounce(function dfinishUp() {
+      console.log("++++++++++++++pullingUp++++++++++++++");
+      this.bscroll.finishPullUp();
+      this.$emit('pullingUp')
+    },1000)
   },
 };
 </script>
