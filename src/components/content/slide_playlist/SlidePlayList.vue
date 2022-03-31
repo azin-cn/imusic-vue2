@@ -71,13 +71,11 @@ export default {
     creatives() {
       return this.SLIDE_PLAYLIST_DATA.creatives
     },
-    resources() {
-      return this.creatives.resources
-    }
   },
   mounted() {
     this.$nextTick( () => {
       this.initSwiper() // 等待数据请求完成
+      Object.freeze(this.SLIDE_PLAYLIST_DATA)  // 冻结对象
     })
   },
   methods: {

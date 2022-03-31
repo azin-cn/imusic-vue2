@@ -40,6 +40,7 @@ export default {
 
     this.$nextTick(() => {
       this.initSwiper()  //最后才是初始化模块，先要有数据
+      Object.freeze(this.HOMEPAGE_BANNER)  // 冻结对象
     })
   },
   methods: {

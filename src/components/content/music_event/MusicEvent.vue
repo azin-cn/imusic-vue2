@@ -16,21 +16,35 @@
       </div>
     </div>
 
-    <div class="about">
-      <div class="about-title">
-        {{about_title}}
+    <div class="news-info" 
+      v-for="(title,index) in titles" 
+      :key="index"
+      @click="newsClick(title)"
+    >
+      <div class="news-info-head">
+        <div class="news-info-title">
+          {{title}} <span :class="{'today': index===0,'after-tomorrow': index===1}">{{tags[index]}}</span>
+        </div>
+        <div class="news-info-text">
+          {{creatives[index].resources[0].uiElement.mainTitle.title}}
+        </div>
       </div>
-      <div class="about-more">
-        {{about_more_text}}<span class="arrow-right  iconfont icon-arrow2"></span>
+      <div class="news-info-img">
+        <img :src="creatives[index].resources[0].uiElement.image.imageUrl" alt="">
       </div>
     </div>
-
   </div>
 
 </template>
 <script>
 export default {
   name: 'MusicEvent',
+  data() {
+    return {
+      titles: ['今天','后天'],
+      tags: ['云村热点','预告']
+    }
+  },
   props: {
     MUSIC_EVENT_DATA: {
       type: Object,
@@ -45,6 +59,16 @@ export default {
     },
     button_text() {
       return this.MUSIC_EVENT_DATA.uiElement.button.text
+    },
+    creatives() {
+      return this.MUSIC_EVENT_DATA.creatives
+    },
+  },
+  methods: {
+    more() {
+    },
+    newsClick(title) {
+      console.log(title);
     }
   }
 }
@@ -52,7 +76,7 @@ export default {
 
 <style lang="less" scoped>
 .music-event {
-  height: 260px;
+  padding-bottom: 2px;
   border-bottom: 8px solid rgba(200, 200, 200, .2);
 }
 .nav-bar {
@@ -94,19 +118,43 @@ export default {
   }
 }
 
-.about {
+
+.news-info {
   display: flex;
-  justify-content: space-between;
-  height: 35px;
-  padding: 0 12px;
-  line-height: 35px;
+  justify-content: center;
+  align-items: center;
+  padding: 12px;
 }
-.about-more {
-  font-size: 14px;
-  line-height: 1.5;
-  .arrow-right {
-    color: #ccc;
-    font-size: 14px;
+.news-info-head{
+  flex: 5;
+  font-size: 16px;
+  line-height: 1.3;
+  .today,
+  .after-tomorrow {
+    padding: 1px 2px;
+    font-size: 16px;
+    color: rgb(231, 198, 154);
+    background-color: #FFFDF6;
+  }
+  .after-tomorrow {
+    color: rgba(126, 121, 121, 0.9);
+    background-color: #F0F0F0;
+  }
+  .news-info-text {
+    overflow: hidden;
+    width: 270px;
+    margin-top: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+.news-info-img {
+  flex: 1;
+  img {
+    width: 100%;
+    border-radius: 12px;
   }
 }
 </style>

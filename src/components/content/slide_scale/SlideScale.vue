@@ -80,6 +80,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       this.initSwiper()  //最后才是初始化模块，先要有数据
+      Object.freeze(this.SLIDE_SCALE_DATA)  // 冻结对象
     })
   },
   methods: {
@@ -164,6 +165,7 @@ export default {
   margin: 4px auto;
   img {
     width: 56px;
+    height: 56px;
     border-radius: 12px;
   }
   .line-title{

@@ -40,7 +40,7 @@ export default {
         click: true,
         tap: "tap",
         bounce: true,
-        momentum: true,
+        // momentum: true,
         momentumLimitTime: 400,
         eventPassthrough: "horizontal",
         probeType: 3, // 开启发送事件
@@ -73,7 +73,7 @@ export default {
       console.log("++++++++++++++pullingUp++++++++++++++");
       this.bscroll.finishPullUp();
       this.$emit('pullingUp')
-    },1000)
+    },1200)
   },
 };
 </script>

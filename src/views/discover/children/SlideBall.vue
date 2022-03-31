@@ -40,6 +40,7 @@ export default {
 
     this.$nextTick( () => {
       this.initSwiper() // 等待数据请求完成
+      Object.freeze(this.HOMEPAGE_SLIDE_BALL)  // 冻结对象
     })
 
   },

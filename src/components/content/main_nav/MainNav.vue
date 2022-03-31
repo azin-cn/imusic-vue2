@@ -67,13 +67,14 @@ export default {
   height: 12.8vw;
   line-height: 12.8vw;
   border-bottom: 1px solid rgba(131, 131, 131, .4);
+  border-radius: 0 0 8px 8px;
 }
 .center {
   text-align: center;
 
   .title {
     padding: 0 1.6vw;
-    transition: .2s; // 添加延时动态变化
+    transition: all .2s; // 添加延时动态变化
   }
 }
 
