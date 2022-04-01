@@ -1,6 +1,6 @@
-<template>
-  <div class="play-tab-bar">
-    <nav-bar class="nav-bar" rwidth="100px">
+<template> <!--阻止事件捕获和阻止事件冒泡-->
+  <div class="play-tab-bar" @click="to_player">
+    <nav-bar class="nav-bar" rwidth="90px">
       <div class="left" slot="left">
         <div class="record-img">
           <img src="~assets/images/record.png" alt=""
@@ -10,17 +10,24 @@
       </div>
 
       <div class="center" slot="center">
-        暂未播放歌曲，快去选一首吧~
+        <div 
+          :class="{'playing-slide-words': isPlaying}"
+        >
+          暂未播放歌曲，快去选一首吧~
+        </div>
       </div>
         
       <div class="right" slot="right">
-        <span 
+        <!--阻止事件冒泡-->
+        <span @click.stop="play_stop" 
           :class="{
             'iconfont': true, 
             'icon-play-music': isPlaying,
             'icon-stop-music': !isPlaying }"
         ></span>
-        <span class="iconfont icon-yinleliebiao"></span>
+        <span @click.stop="show_music_list"
+          class="iconfont icon-yinleliebiao">
+        </span>
       </div>
     </nav-bar>
   </div>
@@ -34,11 +41,22 @@ export default {
   name: 'PlayTabBar',
   data() {
     return {
-      isPlaying: true
+      isPlaying: false
     }
   },
   components: {
     NavBar
+  },
+  methods: {
+    to_player(){
+      this.$router.push('/musicplayer')
+    },
+    play_stop() {
+      console.log("--------");
+    },
+    show_music_list() {
+      console.log("+++++++");
+    }
   }
 }
 </script>
@@ -80,6 +98,7 @@ export default {
   position: absolute;
   top: -8px;
   z-index: 9;
+  margin: 0 4px;
   img {
     width: 54px;
     border-radius: 50%;
@@ -88,9 +107,9 @@ export default {
   }
 }
 .playing-rotate {
-  animation: rotateRecord 1.6s linear infinite;
+  animation: rotate-record 1.6s linear infinite;
 }
-@keyframes rotateRecord {
+@keyframes rotate-record {
   0% {
     transform: scale(1) rotate(0deg);
   }

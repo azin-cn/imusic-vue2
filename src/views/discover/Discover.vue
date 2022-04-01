@@ -90,6 +90,9 @@ export default {
     ...mapActions(['getDisCoverData','getLatestMV','getSlideBall']),
     pullingUp: debounce(function pullingUp() {
       this.currentIndex++
+      if(this.currentIndex >= 3) {
+        this.currentIndex = 3
+      }
       console.log(this.currentIndex);
     },1000)
   }

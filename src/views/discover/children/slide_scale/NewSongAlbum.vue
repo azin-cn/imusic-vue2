@@ -2,14 +2,15 @@
   <div class="new-song-album">
     <slide-scale 
       :SLIDE_SCALE_SWIPER_INDEX = "0"
-      :SLIDE_SCALE_DATA="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG">
+      :SLIDE_SCALE_DATA="HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG"
+      @resourceClick="resourceClick">
     </slide-scale>
   </div>
 </template>
 
 <script>
 
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 import SlideScale from 'components/content/slide_scale/SlideScale'
 
@@ -28,8 +29,14 @@ export default {
       HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG: 
         state => state.DISCOVER_DATA.HOMEPAGE_BLOCK_NEW_ALBUM_NEW_SONG
     }),
-
   },
+  methods: {
+    ...mapActions([]),
+    resourceClick(mId) { // 事件会默认传入参数，调用时只是函数地址索引而已
+      console.log(mId);
+      this.$router.push('/musicplayer')
+    }
+  }
 }
 </script>
 

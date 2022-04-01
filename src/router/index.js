@@ -6,16 +6,18 @@ const Discover = ()=> import('views/discover/Discover')
 const Village = ()=> import('views/village/Village')
 const Video = ()=> import('views/video/Video')
 
+const MusicPlayer = () => import('components/content/player_music/MusicPlayer')
+
 Vue.use(VueRouter)
 
 const routes = [
   {path: '/' , redirect: '/discover'},
   {path: '/discover', component: Discover},
-
-  // 除了发现页和视频页之外，另外两个页面需要做到判断路由
   {path: '/mine', component: Mine,},
   {path: '/village', component: Village},
-  {path: '/video', component: Video}
+  {path: '/video', component: Video},
+  
+  {path: '/musicplayer', component: MusicPlayer}
 ]
 
 const router = new VueRouter({

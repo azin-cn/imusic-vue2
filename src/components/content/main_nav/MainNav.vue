@@ -45,8 +45,6 @@ export default {
       this.currentIndex = index  // 使用的是RefImpl函数实例
       this.changeRoute(this.routes[index])
     },
-
-
   }
 }
 </script>

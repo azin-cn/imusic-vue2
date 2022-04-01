@@ -96,7 +96,8 @@ export default {
     },
     more() {},
     resourceClick(resourceId) {
-      console.log(resourceId);
+      // console.log(resourceId);
+      this.$emit('resourceClick',resourceId)
     }
   },
 }

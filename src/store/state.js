@@ -16,5 +16,17 @@ export const state = {
 
     HOMEPAGE_SLIDE_BALL: null,
     HOMEPAGE_BLOCK_LATEST_MV: null
+  },
+  AUDIO: {
+    PLAYING: false,
+    PAUSED: true,
+    LOOP: false,
+    HISTORY: [],
+    MUSIC: {
+      url:'',
+      img: '',
+      duration: 0,
+      currentTime: 0,
+    }
   }
 }
