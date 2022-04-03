@@ -12,7 +12,7 @@
     <!-- 音乐信息 -->
     <div class="music-info padding12px">
       <div class="info">
-        <h2 class="music-name">一百万个可能</h2>
+        <h2 class="music-name">{{title}}</h2>
         <div class="singer">Christine Welch</div>
       </div>
       <div class="love">
@@ -34,11 +34,11 @@
 
     <div class="play-handler padding12px">
       <div class="pct-bar">
-        <span class="gogo" ></span>
+        <span class="gogo" :style="gogo" ></span>
       </div>
       <div class="time">
-        <span class="used">00:52</span>
-        <span class="total">04:35</span>
+        <span class="used">{{currentTime}}</span>
+        <span class="total">{{duration}}</span>
       </div>
       <div class="handlers">
         <span v-for="(handler_icon,index) in handler_icons" :key="index"
@@ -76,6 +76,50 @@ export default {
     MUSIC() {
       return this.AUDIO.MUSIC
     },
+    title() {
+      return this.MUSIC.title || 'Hello~'
+    },
+    duration() {
+      let duration = this.MUSIC.duration
+      if(!this.MUSIC.duration) {
+        return '00:00'
+      }
+      let minute = Math.floor(duration / 60)
+      let second = Math.floor(duration % 60)
+      if(minute < 10) minute = '0'.concat(minute)
+      if(second < 10) second = '0'.concat(second)
+      return minute+':'+second
+    },
+    currentTime() {
+      let curr =  this.$store.state.CURRENTTIME
+      if(!this.$store.state.CURRENTTIME) {
+        return '00:00'
+      }
+      let minute = Math.floor(curr / 60)
+      let second = Math.floor(curr % 60)
+      if(minute < 10) minute = '0'.concat(minute)
+      if(second < 10) second = '0'.concat(second)
+      // console.log(minute,second);
+      return `${minute}:${second}`
+    },
+    pcbarw() {
+      let pcbar = document.querySelector('.pct-bar')
+      let width = pcbar.offsetWidth
+      // console.log('width',width);
+      return width
+    },
+    gogo() {
+      let curr =  this.$store.state.CURRENTTIME
+      let duration = this.MUSIC.duration
+      if(!curr || !duration) return '0px'
+      let pct = Math.floor(curr / duration * 1000)
+      let width = 'width:' + ( this.pcbarw * pct / 1000 ) + 'px;'
+      console.log(width);
+      return width
+    },
+    cover_img() {
+      return this.MUSIC.img
+    },
     isplaying() {
       return !this.AUDIO.PAUSED
     },
@@ -95,9 +139,6 @@ export default {
       let res  = 'animation-play-state: '.concat(style,';')
       return res
     },
-    cover_img() {
-      return this.MUSIC.img
-    },
 
   },
   watch: {
@@ -105,7 +146,7 @@ export default {
       immediate: true, // 立即监听
       deep: true,
       handler() {}
-    }
+    },
   },
   methods: {
     ...mapActions(['initMusicData']),
@@ -271,9 +312,11 @@ export default {
   background-color: rgba(121, 121,121,.3);
 
   .gogo {
-    width: 10px;
+    width: 0px;
     height: 4px;
     background-color: #fff;
+
+    transition: all .8s;
   }
 
   &::after {

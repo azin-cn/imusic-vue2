@@ -136,7 +136,8 @@ export const actions = {
     MUSIC.id = music.id
     MUSIC.title = music.title
     MUSIC.img = music.img
-    MUSIC.src = music.src
+    MUSIC.src = music.src,
+    MUSIC.singer = music.singer
     MUSIC.currentTime = 0 // 具体的数据由另外一个函数更新
     MUSIC.duration = music.duration
     
@@ -144,7 +145,8 @@ export const actions = {
       id: music.id,
       title: music.title,
       img: music.img,
-      src: music.src
+      src: music.src,
+      singer: music.singer
     }
     let flag = true
     let ML = state.AUDIO.ML

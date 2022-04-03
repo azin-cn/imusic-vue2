@@ -26,6 +26,7 @@ export const state = {
       title: null,
       src: null,
       img: null,
+      singer: null,
       duration: 0
     }
   },

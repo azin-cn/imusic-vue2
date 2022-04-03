@@ -24,7 +24,7 @@
           <div class="swiper-slide-item" 
             v-for="(resource,num) in creative.resources" :key="num"
             :data-slide-scale-rid="resource.resourceId"
-            :data-slide-sclae-title="resource.uiElement.mainTitle.title"
+            :data-slide-scale-title="resource.uiElement.mainTitle.title"
           > <!--每一项的每一行-->
             <img :src="resource.uiElement.image.imageUrl" alt="">
             
@@ -112,13 +112,13 @@ export default {
         if(obj.hasAttribute(attr)) { // 注意和hasAttributes的区别
           id = obj.getAttribute('data-slide-scale-rid')
           // rid = obj.dataset.slideScaleRid
-          title = obj.dataset.slideScaleTitle
+          title = obj.getAttribute('data-slide-scale-title')
           img = obj.children[0].getAttribute('src') // 获取url
           break
         }
         obj = obj.parentNode ? obj.parentNode : null
       }
-      // console.log(rid);
+      // console.log(title);
       if (obj !== null) {
         this.$emit('resourceClick',{id, title, img})
       }
@@ -217,6 +217,7 @@ export default {
   }
   .sub_title{
     overflow: hidden;
+    margin-top: 4px;
     color: #ccc;
     font-size: 12px;
     text-overflow: ellipsis;

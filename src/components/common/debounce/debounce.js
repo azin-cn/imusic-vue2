@@ -11,3 +11,16 @@ export function debounce(func, delay) {
     },delay)
   }
 }
+
+export function throttle(fn,delay) {
+  let timer
+  return function() {
+    let args = arguments;//注意如果要传参的话 这句不能省略
+    if(!timer){
+      timer = setTimeout(()=>{
+        timer = null;
+        fn.apply(this,args)
+      },delay)
+    }
+  }
+}

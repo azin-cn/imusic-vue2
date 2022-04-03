@@ -23,7 +23,7 @@ export const mutations = {
 
   [REC_INIT_MUSIC_DATA](state,{MUSIC,CURRENTTIME}){
     state.AUDIO.MUSIC = MUSIC
-    state.CURRENTTIME = CURRENTTIME
+    state.CURRENTTIME = CURRENTTIME || 0
   },
   [REC_MUSIC_DATA](state, {MUSIC, play, flag, item}) {
     state.AUDIO.MUSIC = MUSIC

@@ -19,6 +19,9 @@
 
 <script>
 import Vue from 'vue'
+import {throttle} from 'components/common/debounce/debounce'
+
+
 import { mapActions } from 'vuex'
 
 import {reqMusicUrl} from 'api/music'
@@ -51,6 +54,7 @@ export default {
   },
   mounted() {
     Vue.prototype.$audio = this // 添加在原型上，方便使用
+    this.pause()
   },
   methods: {
     ...mapActions(['initMusicData','getMusicData']),
@@ -116,11 +120,13 @@ export default {
       // 但是又要注意暂停的问题，playing事件给出了比较好的解决方案
       // 能够监听缓冲或者是暂停之后开始播放的事件
     },
-    updateTime() { // 更新时间
-      console.log(this.$refs.audio.currentTime);
-      
-      this.$set(this.$store.state,'CURRENTTIME',this.$refs.audio.currentTime)
-    }
+    updateTime: throttle(function dUpdate() { // currentTime是一个毫秒，节流以下
+      // console.log(this.$refs.audio.currentTime);
+      this.$set(
+        this.$store.state,'CURRENTTIME',
+        this.$refs.audio.currentTime
+      )
+    },1000)
   }
 }
 </script>

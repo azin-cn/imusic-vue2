@@ -10,11 +10,11 @@
         </div>
       </div>
 
-      <div class="center" slot="center">
+      <div class="center" :style="running_paused" slot="center">
         <div 
           :class="{'playing-slide-words': isPlaying}"
         >
-          暂未播放歌曲，快去选一首吧~
+          {{title}}
         </div>
       </div>
         
@@ -55,6 +55,9 @@ export default {
     },
     MUSIC(){
       return this.AUDIO.MUSIC
+    },
+    title() {
+      return this.MUSIC.title || '暂未播放歌曲，快去选一首吧~'
     },
     isPlaying() {
       return !this.AUDIO.PAUSED
@@ -123,6 +126,9 @@ export default {
   box-shadow: 0 0 6px 2px rgba(131, 131, 131, .3);
   background-color: #fff;
   border-radius: 12px 12px 0 0;
+
+  perspective: 800px;
+  transform-style: preserve-3d;
 }
 
 .left,
@@ -142,6 +148,8 @@ export default {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 700;
+  transition: all .6s;
+  animation: scale-title 3s ease-in-out infinite;
 }
 .record-img {
   position: absolute;
@@ -171,4 +179,36 @@ export default {
   }
 }
 
+@keyframes scale-title {
+  // 0% {
+  //   transform: rotate(0deg) scale(1);
+  // }
+  // 25% {
+  //   transform: rotate(6deg) scale(1.04);
+  // }
+  // 50% {
+  //   transform: rotateX(180deg) scale(1);
+  // }
+  // 75% {
+  //   transform: rotate(-6deg) scale(1.04);
+  // }
+  // 100% {
+  //   transform: rotate(0deg) scale(1);
+  // }
+  0% {
+    transform: translateZ(10px) rotateX(0) ;
+  }
+  25% {
+    transform: translateY(10px) rotateX(-90deg);
+  }
+  50% {
+    transform: translateZ(-10px) rotateX(-180deg) ;
+  }
+  75% {
+    transform: translateY(-10px) rotateX(-270deg) ;
+  }
+  100% {
+    transform: translateZ(10px) rotateX(-360deg) ;
+  }
+}
 </style>
