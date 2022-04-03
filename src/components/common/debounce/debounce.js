@@ -1,5 +1,6 @@
 export function debounce(func, delay) {
   let timer;
+  delay = delay || 100
   return function(){
     if(timer) { // console.log("清除",timer);
       clearTimeout(timer)

@@ -63,7 +63,7 @@ export default {
 </script>
 
 <style lang="less">
-@import url('https://at.alicdn.com/t/font_3280963_jc9xiuysq3.css');
+@import url('https://at.alicdn.com/t/font_3280963_08bztkn4no6b.css');
 
 *[class$='-leave-to']{
   display: none; // 防止抖动

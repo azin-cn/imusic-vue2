@@ -10,8 +10,9 @@
     <audio 
       id="audio" ref="audio" 
       :src="url" :paused="PAUSED"
+      :loop="LOOP"
       @timeupdate="updateTime"
-      @ended="next"
+      @ended="ended"
       autoplay preload>
     </audio>
   </div>
@@ -25,6 +26,7 @@ import {throttle} from 'components/common/debounce/debounce'
 import { mapActions } from 'vuex'
 
 import {reqMusicUrl} from 'api/music'
+import { debounce } from '@/components/common/debounce/debounce'
 
 export default {
   name: 'MAudio',
@@ -37,6 +39,9 @@ export default {
   computed: {
     AUDIO() {
       return this.$store.state.AUDIO
+    },
+    LOOP() {
+      return this.AUDIO.LOOP
     },
     ML() {
       return this.AUDIO.ML
@@ -54,7 +59,7 @@ export default {
   },
   mounted() {
     Vue.prototype.$audio = this // 添加在原型上，方便使用
-    this.pause()
+    this.pause() // 默认是暂停的，不能修改
   },
   methods: {
     ...mapActions(['initMusicData','getMusicData']),
@@ -78,42 +83,62 @@ export default {
           this.$audio.pause()
           // console.log("maudio url null");
           this.initMusicData()
-        }else this.$refs.audio.play() // 注意两个play方法是不一样的。
+        }else {
+          this.$set(this.$store.state.AUDIO,'PAUSED',false)
+          this.$refs.audio.play() // 注意两个play方法是不一样的。
+        }
         return 
       }
-      this.pause()
+      this.pause() // 先暂停当前
       music.src = await this.setMusic(music.id)
 
-      this.$refs.audio.addEventListener('canplay', async ()=>{
-        music.duration = this.$refs.audio.duration // 在加载完成以后，就可以获取duration
-        await this.getMusicData(music) // 提交数据 id img src duration
-      })
+      let context = this
+      this.$refs.audio.addEventListener('canplay', 
+        debounce(function submit() {
+          music.duration = context.$refs.audio.duration // 在加载完成以后，就可以获取duration
+          context.getMusicData(music) // 提交数据 id img src duration
+          // console.log(context)
+        },300)() // 注意一定需要加上括号进行调用否则无法清除定时器
+      )
     },
-    // fastSeek() | 在音频播放器中指定播放时间
     pause() {
       this.$refs.audio.pause()
       this.$set(this.$store.state.AUDIO,'PAUSED',true)
     },
-    prev() { // 上一首
+    ended() {
+      if(this.LOOP === false) { // 当设定的不是循环时
+        this.next()
+      }
+    },
+    loop(state) {
+      this.$set(this.$store.state.AUDIO,'LOOP',state)
+    },
+    async prev() { // 上一首 可以与next合并为一个函数
       let index = 0, len = this.ML.length
       for (let i = 0; i < this.ML.length; i++) {
         let ml = this.ML[i]
-        if(ml.id === id) {
-          index = i==0 ? len-1 : i-1
+        if(ml.id === this.id) {
+          index = i===0 ? len-1 : i-1
+          break
         }
       }
       this.play(this.ML[index])
     },
-    next(id) { // 下一首
+    async next() { // 下一首
       let index = 0, len = this.ML.length
       for (let i = 0; i < this.ML.length; i++) {
         let ml = this.ML[i]
-        if(ml.id === id) {
-          index = i==len-1 ? 0 : i+1
+        if(ml.id === this.id) {
+          index = i===len-1 ? 0 : i+1
+          break
         }
       }
       this.play(this.ML[index])
     },
+    async fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
+      this.$refs.audio.currentTime = currentTime
+      this.play()
+    } ,
     canplay(){ 
       // updateTime更新的有点频繁，可以在能够播放的时候，
       // 给定一个当前的时间戳，其余的地方根据整个时间戳就能知道播放多少时间了，

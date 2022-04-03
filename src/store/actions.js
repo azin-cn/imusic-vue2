@@ -138,7 +138,6 @@ export const actions = {
     MUSIC.img = music.img
     MUSIC.src = music.src,
     MUSIC.singer = music.singer
-    MUSIC.currentTime = 0 // 具体的数据由另外一个函数更新
     MUSIC.duration = music.duration
     
     let item = {

@@ -33,7 +33,9 @@
     </div>
 
     <div class="play-handler padding12px">
-      <div class="pct-bar">
+      <div class="pct-bar"
+        @click="pct_move($event)"
+      >
         <span class="gogo" :style="gogo" ></span>
       </div>
       <div class="time">
@@ -73,13 +75,16 @@ export default {
     AUDIO() {
       return this.$store.state.AUDIO
     },
+    LOOP(){
+      return this.AUDIO.LOOP
+    },
     MUSIC() {
       return this.AUDIO.MUSIC
     },
     title() {
       return this.MUSIC.title || 'Hello~'
     },
-    duration() {
+    duration() { // 音乐时长计算
       let duration = this.MUSIC.duration
       if(!this.MUSIC.duration) {
         return '00:00'
@@ -90,7 +95,7 @@ export default {
       if(second < 10) second = '0'.concat(second)
       return minute+':'+second
     },
-    currentTime() {
+    currentTime() { // 已播放时长计算
       let curr =  this.$store.state.CURRENTTIME
       if(!this.$store.state.CURRENTTIME) {
         return '00:00'
@@ -102,19 +107,20 @@ export default {
       // console.log(minute,second);
       return `${minute}:${second}`
     },
-    pcbarw() {
+    pctbarw() { // 计算当前移动条宽度
       let pcbar = document.querySelector('.pct-bar')
       let width = pcbar.offsetWidth
       // console.log('width',width);
       return width
     },
-    gogo() {
+    gogo() { // 对进度条进行调整
       let curr =  this.$store.state.CURRENTTIME
       let duration = this.MUSIC.duration
-      if(!curr || !duration) return '0px'
-      let pct = Math.floor(curr / duration * 1000)
-      let width = 'width:' + ( this.pcbarw * pct / 1000 ) + 'px;'
-      console.log(width);
+      if(!curr || !duration) return '0px' // 默认返回值
+      let pct = Math.floor(curr / duration * 1000) // 精细化
+      // console.log(pct);
+      let width = 'width:' + ( this.pctbarw * pct / 1000 ) + 'px;'
+      // console.log(width);
       return width
     },
     cover_img() {
@@ -126,7 +132,10 @@ export default {
     handler_icons() {
       let icons = ['icon-liebiaoxunhuan','icon-prev',
         'icon-stop-music','icon-next','icon-yinleliebiao1']
-      if(this.isplaying) {
+      if(this.LOOP) {  // 单曲循环
+        icons[0] = 'icon-danquxunhuan'
+      }
+      if(this.isplaying) { // 是否停止状态
         icons[2] = 'icon-play-music'
       }
       return icons
@@ -152,11 +161,29 @@ export default {
     ...mapActions(['initMusicData']),
     func_handler(index) {
       let obj = this.handler_objs[index]
+      /** 优先响应动画 */
+      let time = Date.now()
+      obj.style.transform = 'scale(1.1)'
+      let timer = setTimeout(() => {
+        obj.style.transform = 'scale(1)' // TODO: 如果同时渲染transition和一个变化的东西是不会发生transition过渡的
+        console.log(Date.now() - time);
+        clearTimeout(timer) // 在还未缩放完成的时候（transition设置比定时器还长的时间），此时就会更改
+      },80)
+
       // 最后调用响应的函数即可，不需要再switch中写复杂的逻辑
-      switch (index) {
+      let state = null
+      let className = 'handler iconfont  ' // 注意空格
+      switch (index) { // js中case没有作用域
         case 0:
+          // 每次去相反的数据即可
+          state = !this.$store.state.AUDIO.LOOP
+          this.$set(this.$store.state.AUDIO,'LOOP',state)
+          className += this.LOOP ? 
+            'icon-danquxunhuan' : 'icon-liebiaoxunhuan'
+          obj.className = className
           break;
         case 1:
+          this.$audio.prev()
           break;
         case 2:
           if(this.MUSIC.src === null) { // 如果url为空不允许点击按钮
@@ -165,7 +192,7 @@ export default {
             this.initMusicData()
             return 
           }
-          let state = !this.$store.state.AUDIO.PAUSED
+          state = !this.$store.state.AUDIO.PAUSED
           // 或者使用 直接赋值 | Vue.set | this.$set 均能生效
           this.$set(this.$store.state.AUDIO,'PAUSED',state)
           if(state) { // 停止播放
@@ -173,7 +200,6 @@ export default {
           }else {
             this.$audio.play()
           }
-          let className = 'handler iconfont ' // 注意空格
           if(this.isplaying) { // 通过判断是否播放了音乐对按钮进行控制
             className += 'icon-play-music'
           }else {
@@ -182,16 +208,21 @@ export default {
           obj.className = className
           break
         case 3:
+          this.$audio.next()
           break;
         case 4:
           break;
-      }
-      obj.style.transform = 'scale(1.8)'
-      let timer = setTimeout(() => {
-        obj.style.transform = 'scale(1)' // TODO: 如果同时渲染transition和一个变化的东西是不会发生transition过渡的
-        clearTimeout(timer) // 在还未缩放完成的时候（transition设置比定时器还长的时间），此时就会更改
-      },80)
-    } // switch end
+      }// switch end
+    }, 
+    pct_move(e) {
+      // console.log(e.offsetX); // 计算的正确距离
+      let x = e.offsetX // 点击的位置
+      let w = this.pctbarw // 进度条总宽度
+      let duration = this.MUSIC.duration // 总时长
+      let pct = Math.floor(x / w * 1000) // 得到占比，乘上1000提高精度
+      let currentTime = Math.floor(pct * duration / 1000)
+      this.$audio.fastSeek(currentTime)
+    }
   }
 }
 </script>
@@ -313,7 +344,7 @@ export default {
 
   .gogo {
     width: 0px;
-    height: 4px;
+    height: 100%;
     background-color: #fff;
 
     transition: all .8s;
@@ -343,7 +374,7 @@ export default {
   line-height: 62px;
   margin-top: 8px;
   .handler {
-    transition: all 1s;
+    transition: all .1s;
   }
   .iconfont {
     color: #fff;
