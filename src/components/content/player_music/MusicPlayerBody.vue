@@ -5,7 +5,8 @@
     <div class="music-img">
       <img :class="{'record-rod':true,'rotate-start': isplaying}" 
         src="~assets/images/rod-c.png" alt="">
-      <img :class="{'cover':true,'rotate-cover':isplaying}" src="~assets/images/cover.webp"  alt="">
+      <img v-if="!cover_img" class="cover" :style="running_paused" src="~assets/images/cover.webp"  alt="">
+      <img v-if="cover_img" class="cover" :style="running_paused" :src="cover_img"  alt="">
     </div>
 
     <!-- 音乐信息 -->
@@ -41,7 +42,7 @@
       </div>
       <div class="handlers">
         <span v-for="(handler_icon,index) in handler_icons" :key="index"
-          :class="'handler h_transition iconfont  ' + handler_icon"
+          :class="'handler iconfont  ' + handler_icon"
           @click="func_handler(index)"
         ></span>
       </div>
@@ -51,17 +52,15 @@
 
 
 <script>
+import { mapActions } from 'vuex'
 export default {
   name: 'MusicPlayerBody',
   data() {
     return {
-      isplaying: false,
       more_titles: ['一起唱','音效','下载','评论','更多'],
       more_actions: 
         ['icon-sing','icon-yinxiao',
         'icon-xiazai','icon-xiaoxi1','icon-shudian'],
-      handler_icons: ['icon-liebiaoxunhuan','icon-prev',
-        'icon-stop-music','icon-next','icon-yinleliebiao1'],
     }
   },
   props: {
@@ -71,11 +70,45 @@ export default {
     },
   },
   computed:{
-    handler_objs (){
+    AUDIO() {
+      return this.$store.state.AUDIO
+    },
+    MUSIC() {
+      return this.AUDIO.MUSIC
+    },
+    isplaying() {
+      return !this.AUDIO.PAUSED
+    },
+    handler_icons() {
+      let icons = ['icon-liebiaoxunhuan','icon-prev',
+        'icon-stop-music','icon-next','icon-yinleliebiao1']
+      if(this.isplaying) {
+        icons[2] = 'icon-play-music'
+      }
+      return icons
+    },
+    handler_objs() {
       return document.querySelectorAll('.handler')
+    },
+    running_paused() {
+      let style = this.isplaying ? 'running' : 'paused'
+      let res  = 'animation-play-state: '.concat(style,';')
+      return res
+    },
+    cover_img() {
+      return this.MUSIC.img
+    },
+
+  },
+  watch: {
+    'AUDIO': {
+      immediate: true, // 立即监听
+      deep: true,
+      handler() {}
     }
   },
   methods: {
+    ...mapActions(['initMusicData']),
     func_handler(index) {
       let obj = this.handler_objs[index]
       // 最后调用响应的函数即可，不需要再switch中写复杂的逻辑
@@ -85,25 +118,39 @@ export default {
         case 1:
           break;
         case 2:
-          this.isplaying = !this.isplaying
-          let className = 'handler h_transition iconfont ' // 注意空格
+          if(this.MUSIC.src === null) { // 如果url为空不允许点击按钮
+            this.$audio.pause()
+            console.log("Body src null");
+            this.initMusicData()
+            return 
+          }
+          let state = !this.$store.state.AUDIO.PAUSED
+          // 或者使用 直接赋值 | Vue.set | this.$set 均能生效
+          this.$set(this.$store.state.AUDIO,'PAUSED',state)
+          if(state) { // 停止播放
+            this.$audio.pause()
+          }else {
+            this.$audio.play()
+          }
+          let className = 'handler iconfont ' // 注意空格
           if(this.isplaying) { // 通过判断是否播放了音乐对按钮进行控制
             className += 'icon-play-music'
           }else {
             className += 'icon-stop-music'
           }
           obj.className = className
-          let timer = setTimeout(() => {
-            
-            clearTimeout(timer)
-          },0)
           break
         case 3:
           break;
         case 4:
           break;
       }
-    }
+      obj.style.transform = 'scale(1.8)'
+      let timer = setTimeout(() => {
+        obj.style.transform = 'scale(1)' // TODO: 如果同时渲染transition和一个变化的东西是不会发生transition过渡的
+        clearTimeout(timer) // 在还未缩放完成的时候（transition设置比定时器还长的时间），此时就会更改
+      },80)
+    } // switch end
   }
 }
 </script>
@@ -149,10 +196,14 @@ export default {
     background: url('~assets/images/record.png');
     background-size: 280px;
     border-radius: 50%;
-    transition: all 2s linear; // 失效，套一层和animation分开
+    transition: all 1s linear; // 失效，套一层和animation分开
+    animation: rotate-img 1.6s linear infinite;
+    animation-play-state:paused;
+    -webkit-animation-play-state:paused;
   }
   .rotate-cover {
     // transform: rotate(180deg);
+    // animation-fill-mode: forwards; // 对于无线次数的无效
     animation: rotate-img 1.6s linear infinite;
   }
 }
@@ -248,10 +299,12 @@ export default {
   height: 62px;
   line-height: 62px;
   margin-top: 8px;
+  .handler {
+    transition: all 1s;
+  }
   .iconfont {
     color: #fff;
     font-size: 28px;
-    transition: all 1s;
   }
   .iconfont:nth-child(3) {
     font-size: 48px;

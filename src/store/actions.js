@@ -2,7 +2,9 @@
 import {
   REC_DISCOVERD_DATA,
   REC_DISCOVERD_DATA_SLIDE_BALL,
-  REC_DISCOVERD_DATA_LATEST_MV
+  REC_DISCOVERD_DATA_LATEST_MV,
+  REC_INIT_MUSIC_DATA,
+  REC_MUSIC_DATA,
 } from './mutations_type'
 
 import { 
@@ -10,7 +12,6 @@ import {
   reqSlideBall,
   reqLatestMV
  } from 'api/discover'
-
 
 export const actions = {
   /**
@@ -111,6 +112,55 @@ export const actions = {
     });
     // console.log("%%%%%%",data);
     commit(REC_DISCOVERD_DATA,{payload,tags})
+  },
+
+  async initMusicData({commit}) {
+    let MUSIC = { // 当前的音乐
+      id: 0,
+      title: null,
+      src: null,
+      img: null,
+      duration: 0,
+    }
+    let CURRENTTIME = 0
+    commit(REC_INIT_MUSIC_DATA, {MUSIC,CURRENTTIME})
+  },
+
+  /**
+   * getMusicData 拼接播放器的数据
+   * @param {Object} music id,img,src,duration
+   * @returns 
+   */
+  async getMusicData({state,commit},music) {
+    let MUSIC = {}
+    MUSIC.id = music.id
+    MUSIC.title = music.title
+    MUSIC.img = music.img
+    MUSIC.src = music.src
+    MUSIC.currentTime = 0 // 具体的数据由另外一个函数更新
+    MUSIC.duration = music.duration
+    
+    let item = {
+      id: music.id,
+      title: music.title,
+      img: music.img,
+      src: music.src
+    }
+    let flag = true
+    let ML = state.AUDIO.ML
+    if(ML.length !==0 && ML[ML.length-1].id === item.id) {
+      console.log('重复点击了！')
+      flag = false
+    }
+    let play = music.src ? true : false
+    flag = flag && play ? true : false //
+    // console.log(state.AUDIO);
+    commit(REC_MUSIC_DATA,{MUSIC, play, flag, item})
+  },
+  async getUpdateTime(time){ 
+    // 感觉还要经过actions太消耗性能了，
+    // 或许用一个起始时间标记即可，
+    // 其余的需要用都的地方根绝开始播放的当前时间戳，检测多少即可
   }
 
 }

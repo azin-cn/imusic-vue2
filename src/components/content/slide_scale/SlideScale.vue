@@ -14,13 +14,18 @@
       </div>
     </div>
     <div :class="'SLIDE_SCALE_SWIPER_INDEX_'+ SLIDE_SCALE_SWIPER_INDEX">
-      <div class="swiper-wrapper">
+      <div class="swiper-wrapper" @click.stop="resourceClick($event)">
+        <!-- 对事件进行代理，
+          判断事件的触发对象是对象还是子元素 
+          img | .line-title | play-button
+          此时查找给定的rid即可
+        -->
         <div class="swiper-slide" v-for="(creative,index) in creatives" :key="index">
           <div class="swiper-slide-item" 
             v-for="(resource,num) in creative.resources" :key="num"
-            @click="resourceClick(resource.resourceId)"
+            :data-slide-scale-rid="resource.resourceId"
+            :data-slide-sclae-title="resource.uiElement.mainTitle.title"
           > <!--每一项的每一行-->
-            
             <img :src="resource.uiElement.image.imageUrl" alt="">
             
             <div class="line-title">
@@ -95,9 +100,28 @@ export default {
       })
     },
     more() {},
-    resourceClick(resourceId) {
-      // console.log(resourceId);
-      this.$emit('resourceClick',resourceId)
+    resourceClick(e) {
+      let obj = e.target
+      // let tag = obj.nodeName.toLowerCase() // 判断img
+      // let className = obj.getAttribute('class') // 判断title和span
+
+      // 更新，不再使用单个的判断，而是通过迭代寻找含有data-rid的父元素
+      let attr = 'data-slide-scale-rid'
+      let id,title,img
+      while(obj !== null) { // 可以使用递归
+        if(obj.hasAttribute(attr)) { // 注意和hasAttributes的区别
+          id = obj.getAttribute('data-slide-scale-rid')
+          // rid = obj.dataset.slideScaleRid
+          title = obj.dataset.slideScaleTitle
+          img = obj.children[0].getAttribute('src') // 获取url
+          break
+        }
+        obj = obj.parentNode ? obj.parentNode : null
+      }
+      // console.log(rid);
+      if (obj !== null) {
+        this.$emit('resourceClick',{id, title, img})
+      }
     }
   },
 }

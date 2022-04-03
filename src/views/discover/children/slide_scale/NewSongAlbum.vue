@@ -31,10 +31,10 @@ export default {
     }),
   },
   methods: {
-    ...mapActions([]),
-    resourceClick(mId) { // 事件会默认传入参数，调用时只是函数地址索引而已
-      console.log(mId);
-      this.$router.push('/musicplayer')
+    resourceClick({id,title,img}) { // 事件会默认传入参数，调用时只是函数地址索引而已
+      // console.log("%%%newsongalbum%%%",{id,title,img});
+      this.$audio.play({id,title,img}) // 调用AUDIO对象进行播放
+      this.$router.push('/musicplayer') // 页面跳转
     }
   }
 }

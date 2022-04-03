@@ -4,7 +4,8 @@
       <div class="left" slot="left">
         <div class="record-img">
           <img src="~assets/images/record.png" alt=""
-            :class="{'playing-rotate': isPlaying}"
+            class="playing-rotate"
+            :style="running_paused"
           >
         </div>
       </div>
@@ -36,26 +37,74 @@
 <script>
 
 import NavBar from 'components/common/nav_bar/NavBar'
+import { mapActions, mapState } from 'vuex'
 
 export default {
   name: 'PlayTabBar',
   data() {
     return {
-      isPlaying: false
+      
     }
   },
   components: {
     NavBar
   },
+  computed: {
+    AUDIO() {
+      return this.$store.state.AUDIO
+    },
+    MUSIC(){
+      return this.AUDIO.MUSIC
+    },
+    isPlaying() {
+      return !this.AUDIO.PAUSED
+    },
+    running_paused() {
+      let state = this.isPlaying ? 'running' : 'paused'
+      let res = 'animation-play-state: '.concat(state,';')
+      return res
+    }
+  },
+  watch: {
+    'AUDIO' : {
+      immediate: true,
+      deep: true,
+      handler() {}
+    }
+  },
   methods: {
+    ...mapActions(['initMusicData']),
     to_player(){
       this.$router.push('/musicplayer')
     },
-    play_stop() {
-      console.log("--------");
+    play_stop(e) {
+      if(this.MUSIC.src === null) { // 如果url为空不允许点击按钮
+        this.$audio.pause()
+        this.initMusicData()
+        console.log("tab src null");
+        return 
+      }
+      let state = !this.$store.state.AUDIO.PAUSED
+      // 或者使用 直接赋值 | Vue.set | this.$set 均能生效
+      this.$set(this.$store.state.AUDIO,'PAUSED',state)
+      if(state) { // 停止播放
+        this.$audio.pause()
+      }else {
+        this.$audio.play()
+      }
+      let obj = e.target
+      this.scale_icon(obj)
     },
-    show_music_list() {
-      console.log("+++++++");
+    show_music_list(e) {
+      let obj = e.target
+      this.scale_icon(obj)
+    },
+    scale_icon(obj) {
+      obj.style.transform = 'scale(1.1)'
+      let timer = setTimeout(() => {
+        obj.style.transform = 'scale(1)'
+        clearTimeout(timer)
+      }, 80);
     }
   }
 }
@@ -103,11 +152,12 @@ export default {
     width: 54px;
     border-radius: 50%;
     box-shadow: 0 0 6px 3px #ccc;
-    // transition: all 1s;
+    transition: all 1s;
   }
 }
 .playing-rotate {
   animation: rotate-record 1.6s linear infinite;
+  animation-play-state: paused;
 }
 @keyframes rotate-record {
   0% {
@@ -120,4 +170,5 @@ export default {
     transform: scale(1) rotate(360deg);
   }
 }
+
 </style>

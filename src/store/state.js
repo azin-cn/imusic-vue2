@@ -18,15 +18,16 @@ export const state = {
     HOMEPAGE_BLOCK_LATEST_MV: null
   },
   AUDIO: {
-    PLAYING: false,
     PAUSED: true,
     LOOP: false,
-    HISTORY: [],
-    MUSIC: {
-      url:'',
-      img: '',
-      duration: 0,
-      currentTime: 0,
+    ML: [], // 音乐列表
+    MUSIC: { // 当前的音乐
+      id: 0,
+      title: null,
+      src: null,
+      img: null,
+      duration: 0
     }
-  }
+  },
+  CURRENTTIME:0,
 }

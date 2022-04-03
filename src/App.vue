@@ -7,6 +7,7 @@
       </keep-alive>
     </transition>
     <play-tab-bar v-show="nav_tab_display"></play-tab-bar>
+    <m-audio></m-audio>
   </div>
 </template>
 
@@ -14,7 +15,7 @@
 
 import NavBar from "components/content/main_nav/MainNav";
 import PlayTabBar from 'components/content/play_tab_bar/PlayTabBar'
-
+import MAudio from 'components/content/audio/MAudio'
 export default {
   name: 'App',
   data () {
@@ -25,7 +26,8 @@ export default {
   },
   components: {
     NavBar,
-    PlayTabBar
+    PlayTabBar,
+    MAudio
   },
   computed: {
     nav_tab_display() {
@@ -54,7 +56,7 @@ export default {
       }else {
         this.transitionName = 'v'
       }
-      console.log(this.transitionName);
+      // console.log(this.transitionName);
     }
   }
 }

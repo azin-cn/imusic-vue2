@@ -1,5 +1,7 @@
 <template>
   <div class="music-player" key="music-player">
+    <div class="bg" :style="running_paused"></div>
+
     <music-player-nav 
       @slideDown="slideDown">
     </music-player-nav>
@@ -25,8 +27,41 @@ export default {
       // down: false
     }
   },
-  mounted() {
-
+  computed: {
+    AUDIO() {
+      return this.$store.state.AUDIO
+    },
+    PAUSED() {
+      return this.AUDIO.PAUSED
+    },
+    MUSIC() {
+      return this.AUDIO.MUSIC
+    },
+    BGIMG() {
+      return this.MUSIC.img
+    },
+    running_paused() {
+      let style = !this.PAUSED ? 'running' : 'paused'
+      let res  = 'animation-play-state: '.concat(style,';')
+      return res
+    },
+  },
+  watch: {
+    'AUDIO': {
+      immediate: true, // 立即监听
+      deep: true,
+      handler() {
+        this.$nextTick(() => {
+          let url = 'url('.concat(this.BGIMG,')')
+          if(!this.MUSIC || !this.BGIMG || this.BGIMG.length === 0 ) url="" // 默认展示原有的数据
+          let player = document.querySelector('.music-player')
+          let bg = document.querySelector('.bg')
+          // console.log(url,div);
+          player.style.background = url
+          bg.style.background = url
+        })
+      }
+    }
   },
   beforeRouteEnter(to,from,next){
     // 在渲染该组件的对应路由被 confirm 前调用
@@ -44,9 +79,6 @@ export default {
       this.$router.back() // this.$router.go(-1)
     }
   },
-  destroyed() {
-    console.log('destoryed');
-  }
 }
 </script>
 
@@ -57,15 +89,35 @@ export default {
   padding-right: 12px;
 }
 .music-player {
-  // 毛玻璃效果
-  &::before {
-    content: '';
+  overflow: hidden;
+  position: relative;
+  z-index: 0;
+  background-image: url('~assets/images/player-bgimg.jpg');
+  // 毛玻璃效果，背景缩放效果
+  .bg {
     position: absolute;
     z-index: -1;
     top: 0; right: 0; bottom: 0; left: 0; // 铺满整个父元素
-    filter: blur(12px);
-    background: url('~assets/images/player-bgimg.jpg');
-    background-size: cover;
+    filter: blur(10px);
+    background: url('~assets/images/player-bgimg.jpg') rgba(0, 0, 0, .6);
+    // background-size: cover;
+    background-size: 100% 100%;
+    transform: scale(1.3);
+    transform-origin: 60%;
+    transition: all 1.6s cubic-bezier(.46,.23,0,1.45);
+    animation: bg 1s linear infinite;
+    animation-play-state: paused;
+  }
+}
+@keyframes bg {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.8);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 </style>
