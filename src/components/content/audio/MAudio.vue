@@ -12,7 +12,7 @@
       :src="SRC" :paused="PAUSED"
       :loop="LOOP"
       @timeupdate="updateTime"
-      @ended="ended"
+      @ended="ended" @canplay="canplay"
       autoplay preload>
     </audio>
   </div>
@@ -25,7 +25,6 @@ import {throttle} from 'components/common/debounce/debounce'
 
 import { mapActions } from 'vuex'
 
-import {reqMusicUrl} from 'api/music'
 import { debounce } from '@/components/common/debounce/debounce'
 
 export default {
@@ -66,24 +65,17 @@ export default {
   },
   methods: {
     ...mapActions(['initMusicData','getMusicData']),
-    async setMusic(id) {
-      this.id = id
-      let resp = await reqMusicUrl(id)
-      if(resp.code !== 200 || resp.data[0].url === null) {
-        console.log('url获取失败');
-        // 进行提示，检查版权
-        this.$audio.pause() // 停止播放音乐
-        this.initMusicData() // 重置当前的播放歌曲对象
-      }
-      let src = resp.data[0].url
-      this.$refs.audio.load() // 重新加载
-      return src
+    canplay() {
+      console.log('canplay');
+      this.$set(
+        this.$store.state.AUDIO.MUSIC,'duration',
+        this.$refs.audio.duration)
     },
     async play(music) { // 通过判断参数music来判断是继续播放还是播放新歌曲
       if(!music) { // 参数为空，继续播放
-        if(this.url === null) { // 如果已经不是初始化的url，默认不为null
+        if(this.SRC === null) { // 如果已经不是初始化的url，默认不为null
+          console.log("maudio url null");
           this.$audio.pause()
-          // console.log("maudio url null");
           this.initMusicData()
         }else {
           this.$set(this.$store.state.AUDIO,'PAUSED',false)
@@ -92,15 +84,13 @@ export default {
         return 
       }
       this.pause() // 先暂停当前
-      music.src = await this.setMusic(music.id)
 
       let context = this
       this.$refs.audio.addEventListener('canplay', 
         debounce(function submit() {
-          music.duration = context.$refs.audio.duration // 在加载完成以后，就可以获取duration
-          context.getMusicData(music) // 提交数据 id img src duration
           // console.log(context)
-        },300)() // 注意一定需要加上括号进行调用否则无法清除定时器
+          context.getMusicData(music) // 提交数据 id title img src singer等
+        },300)()// 注意一定需要加上括号进行调用否则无法清除定时器
       )
     },
     pause() {
@@ -138,8 +128,9 @@ export default {
       this.play(this.ML[index])
     },
     async fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
+      // console.log("%%%%%%",Math.floor(currentTime));
       this.$refs.audio.currentTime = Math.floor(currentTime)
-      this.play()
+      this.play();
     } ,
     canplay(){ 
       // updateTime更新的有点频繁，可以在能够播放的时候，
@@ -148,10 +139,9 @@ export default {
       // 能够监听缓冲或者是暂停之后开始播放的事件
     },
     updateTime: throttle(function dUpdate() { // currentTime是一个毫秒，节流以下
-      // console.log(this.$refs.audio.currentTime);
       this.$set(
         this.$store.state,'CURRENTTIME',
-        this.$refs.audio.currentTime
+        this.$refs.audio.currentTime.toFixed(6)
       )
     },1000)
   }

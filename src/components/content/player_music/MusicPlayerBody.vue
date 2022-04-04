@@ -21,7 +21,7 @@
     </div>
 
     <!-- 音乐歌词 -->
-    <div class="lyric padding12px">
+    <div class="lyric-inline padding12px">
       <span> 在一瞬间 </span>
     </div>
 
@@ -221,6 +221,7 @@ export default {
       let x = e.offsetX // 点击的位置
       let w = this.pctbarw // 进度条总宽度
       let duration = this.MUSIC.duration // 总时长
+      if(isNaN(duration)) return;
       let pct = Math.floor(x / w * 1000) // 得到占比，乘上1000提高精度
       let currentTime = Math.floor(pct * duration / 1000)
       this.$audio.fastSeek(currentTime)
@@ -279,7 +280,7 @@ export default {
   .rotate-cover {
     // transform: rotate(180deg);
     // animation-fill-mode: forwards; // 对于无线次数的无效
-    animation: rotate-img 1.6s linear infinite;
+    animation: rotate-img 1.8s linear infinite;
   }
 }
 @keyframes rotate-img {
@@ -320,7 +321,7 @@ export default {
   }
 }
 
-.lyric {
+.lyric-inline {
   height: 32px;
   line-height: 32px;
   font-size: 16px;

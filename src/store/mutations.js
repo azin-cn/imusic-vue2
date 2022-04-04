@@ -25,9 +25,9 @@ export const mutations = {
     state.AUDIO.MUSIC = MUSIC
     state.CURRENTTIME = CURRENTTIME || 0
   },
-  [REC_MUSIC_DATA](state, {MUSIC, play, flag, item}) {
+  [REC_MUSIC_DATA](state, {MUSIC, play, flag, music}) {
     state.AUDIO.MUSIC = MUSIC
     state.AUDIO.PAUSED = !play
-    if (flag) state.AUDIO.ML.push(item)
+    if (flag) state.AUDIO.ML.push(music)
   }
 }

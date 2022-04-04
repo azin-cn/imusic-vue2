@@ -27,7 +27,8 @@ export const state = {
       src: null,
       img: null,
       singer: null,
-      duration: 0
+      duration: 0,
+      lyric: null,
     }
   },
   CURRENTTIME:0,

@@ -30,3 +30,18 @@ export function reqMusicUrl(id) {
     }
   })
 }
+
+/**
+ * reqMusicLyric 获取音乐的歌词
+ * @type GET
+ * @param {Number} id 
+ * @returns 
+ */
+export function reqMusicLyric(id) {
+  return request({
+    url: '/lyric',
+    params: {
+      id
+    }
+  })
+}

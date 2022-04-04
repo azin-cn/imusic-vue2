@@ -13,6 +13,12 @@ import {
   reqLatestMV
  } from 'api/discover'
 
+ import {
+  reqCheckMusic,
+  reqMusicUrl,
+  reqMusicLyric
+ } from 'api/music'
+
 export const actions = {
   /**
    * getLatestMV 获取最新的MV
@@ -114,13 +120,19 @@ export const actions = {
     commit(REC_DISCOVERD_DATA,{payload,tags})
   },
 
+  /**
+   * initMusicData 初始化音乐的信息
+   * @param {*} commit 
+   */
   async initMusicData({commit}) {
     let MUSIC = { // 当前的音乐
       id: 0,
       title: null,
       src: null,
       img: null,
+      singer: null,
       duration: 0,
+      lyric: null
     }
     let CURRENTTIME = 0
     commit(REC_INIT_MUSIC_DATA, {MUSIC,CURRENTTIME})
@@ -132,36 +144,53 @@ export const actions = {
    * @returns 
    */
   async getMusicData({state,commit},music) {
-    let MUSIC = {}
-    MUSIC.id = music.id
-    MUSIC.title = music.title
-    MUSIC.img = music.img
-    MUSIC.src = music.src,
-    MUSIC.singer = music.singer
-    MUSIC.duration = music.duration
-    
-    let item = {
-      id: music.id,
-      title: music.title,
-      img: music.img,
-      src: music.src,
-      singer: music.singer
+    const {id, title, img,singer} = music
+
+    /** duration 写在这，但是会有单独更新
+     * 因为如果直接在这里通过new Audio的形式进行更新
+     * 那么会发两次请求，这里new audio一次，audio标签中会有一次
+     * 
+     * 将数据src请求得到以后，然后将src传入audio的标签
+     * 进行canplay监听，最后得到duration，然后更新即可
+     */
+    let src,duration,lyric // duration单独进行更新
+    let resp
+
+    resp = await reqMusicUrl(id)
+    if(resp.code !== 200 || src === null) {
+      console.log('actions url获取失败');
+      // 进行提示，检查版权，或者检查音乐版权
+    }else {
+      src = resp.data[0].url
     }
-    let flag = true
+    
+    resp = await reqMusicLyric(id)
+    lyric = '未找到歌词~~'
+    if(resp.code !== 200) {
+      console.log('actions 找不到歌词');
+      // 进行提示，检查网络问题
+    }else {
+      lyric = resp.lrc.lyric
+    }
+    
+    let MUSIC = { // 正在播放的音乐对象
+      id,title,img,src,
+      singer,duration,lyric,
+    }
+    music = { // 表示播放将要存入历史的对象
+      id,title,img,src,singer,duration
+    }
+
+    let flag = true  // 默认可以存入播放列表历史
     let ML = state.AUDIO.ML
-    if(ML.length !==0 && ML[ML.length-1].id === item.id) {
-      console.log('重复点击了！')
+    if(ML.length !==0 && ML[ML.length-1].id === music.id) {
+      console.log('重复点击了！不加入播放历史列表')
       flag = false
     }
-    let play = music.src ? true : false
-    flag = flag && play ? true : false //
+    let play = music.src ? true : false // 是否为空
+    flag = flag && play ? true : false // 
     // console.log(state.AUDIO);
-    commit(REC_MUSIC_DATA,{MUSIC, play, flag, item})
+    commit(REC_MUSIC_DATA,{MUSIC, play, flag, music})
   },
-  async getUpdateTime(time){ 
-    // 感觉还要经过actions太消耗性能了，
-    // 或许用一个起始时间标记即可，
-    // 其余的需要用都的地方根绝开始播放的当前时间戳，检测多少即可
-  }
 
 }
