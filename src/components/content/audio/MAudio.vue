@@ -9,7 +9,7 @@
     -->
     <audio 
       id="audio" ref="audio" 
-      :src="url" :paused="PAUSED"
+      :src="SRC" :paused="PAUSED"
       :loop="LOOP"
       @timeupdate="updateTime"
       @ended="ended"
@@ -48,6 +48,9 @@ export default {
     },
     PAUSED() {
       return this.AUDIO.PAUSED
+    },
+    SRC() {
+      return this.AUDIO.MUSIC.src
     }
   },
   watch: {
@@ -68,12 +71,11 @@ export default {
       let resp = await reqMusicUrl(id)
       if(resp.code !== 200 || resp.data[0].url === null) {
         console.log('url获取失败');
-        // 进行提示
+        // 进行提示，检查版权
         this.$audio.pause() // 停止播放音乐
         this.initMusicData() // 重置当前的播放歌曲对象
       }
       let src = resp.data[0].url
-      this.url = src  // 设置属性
       this.$refs.audio.load() // 重新加载
       return src
     },
@@ -136,7 +138,7 @@ export default {
       this.play(this.ML[index])
     },
     async fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
-      this.$refs.audio.currentTime = currentTime
+      this.$refs.audio.currentTime = Math.floor(currentTime)
       this.play()
     } ,
     canplay(){ 

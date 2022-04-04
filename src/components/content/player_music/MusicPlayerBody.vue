@@ -54,6 +54,7 @@
 
 
 <script>
+import { debounce } from '@/components/common/debounce/debounce'
 import { mapActions } from 'vuex'
 export default {
   name: 'MusicPlayerBody',
@@ -109,9 +110,10 @@ export default {
     },
     pctbarw() { // 计算当前移动条宽度
       let pcbar = document.querySelector('.pct-bar')
-      let width = pcbar.offsetWidth
+      let width = null
+      if(pcbar) width = pcbar.offsetWidth // 增加组件的判断选项，否则在组建失活时会报错
       // console.log('width',width);
-      return width
+      return width || 'width: 0px;'
     },
     gogo() { // 对进度条进行调整
       let curr =  this.$store.state.CURRENTTIME
@@ -162,11 +164,11 @@ export default {
     func_handler(index) {
       let obj = this.handler_objs[index]
       /** 优先响应动画 */
-      let time = Date.now()
-      obj.style.transform = 'scale(1.1)'
+      // let time = Date.now()
+      obj.style.transform = 'scale(1.2)'
       let timer = setTimeout(() => {
         obj.style.transform = 'scale(1)' // TODO: 如果同时渲染transition和一个变化的东西是不会发生transition过渡的
-        console.log(Date.now() - time);
+        // console.log(Date.now() - time);
         clearTimeout(timer) // 在还未缩放完成的时候（transition设置比定时器还长的时间），此时就会更改
       },80)
 
@@ -214,7 +216,7 @@ export default {
           break;
       }// switch end
     }, 
-    pct_move(e) {
+    pct_move: debounce(function dmove(e) {
       // console.log(e.offsetX); // 计算的正确距离
       let x = e.offsetX // 点击的位置
       let w = this.pctbarw // 进度条总宽度
@@ -222,7 +224,7 @@ export default {
       let pct = Math.floor(x / w * 1000) // 得到占比，乘上1000提高精度
       let currentTime = Math.floor(pct * duration / 1000)
       this.$audio.fastSeek(currentTime)
-    }
+    },300)
   }
 }
 </script>
@@ -253,7 +255,8 @@ export default {
     top: -4px;
     right: -26px;
     width: 86px;
-    transition: all .6s cubic-bezier(.52,.01,0,1.13);
+    transition: all .6s;
+    // transition: all .6s cubic-bezier(.52,.01,0,1.13);
     transform-origin: 70% 20%;
     transform: rotate(-12deg);
   }
@@ -294,6 +297,12 @@ export default {
   color: #fff;
   .info {
     flex: 5;
+    .music-name {
+      width: 272px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
     .singer {
       margin-top: 12px;
       color: #D3D8DB;

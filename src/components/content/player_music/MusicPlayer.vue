@@ -43,7 +43,7 @@ export default {
     running_paused() {
       let style = !this.PAUSED ? 'running' : 'paused'
       let res  = 'animation-play-state: '.concat(style,';')
-      return res
+      return res 
     },
   },
   watch: {
@@ -56,9 +56,11 @@ export default {
           if(!this.MUSIC || !this.BGIMG || this.BGIMG.length === 0 ) url="" // 默认展示原有的数据
           let player = document.querySelector('.music-player')
           let bg = document.querySelector('.bg')
-          // console.log(url,div);
-          player.style.background = url
-          bg.style.background = url
+          if(player && bg) {
+            // console.log(url,div);
+            player.style.background = url
+            bg.style.background = url
+          }
         })
       }
     }

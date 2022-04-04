@@ -150,6 +150,7 @@ export default {
   font-weight: 700;
   transition: all .6s;
   animation: scale-title 3s ease-in-out infinite;
+  // animation: scale-title 3s ease-in-out infinite alternate;
 }
 .record-img {
   position: absolute;
