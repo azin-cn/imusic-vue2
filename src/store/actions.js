@@ -5,6 +5,7 @@ import {
   REC_DISCOVERD_DATA_LATEST_MV,
   REC_INIT_MUSIC_DATA,
   REC_MUSIC_DATA,
+  REC_MUSIC_DURATION
 } from './mutations_type'
 
 import { 
@@ -192,5 +193,14 @@ export const actions = {
     // console.log(state.AUDIO);
     commit(REC_MUSIC_DATA,{MUSIC, play, flag, music})
   },
+
+  /**
+   * getMusicDuration 更新音乐的时间
+   * @param {*} param0 
+   * @param {*} duration 
+   */
+  async getMusicDuration({commit},duration) {
+    commit(REC_MUSIC_DURATION,{duration})
+  }
 
 }

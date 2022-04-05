@@ -32,7 +32,6 @@ export default {
   data(){
     return {
       id: 0,
-      url: 'url'  // 当前获得的数据
     }
   },
   computed: {
@@ -49,6 +48,7 @@ export default {
       return this.AUDIO.PAUSED
     },
     SRC() {
+      // this.$refs.audio.load() //不能写在这，否则无法加载组件，因为会引发循环
       return this.AUDIO.MUSIC.src
     }
   },
@@ -64,13 +64,20 @@ export default {
     this.pause() // 默认是暂停的，不能修改
   },
   methods: {
-    ...mapActions(['initMusicData','getMusicData']),
-    canplay() {
-      console.log('canplay');
+    ...mapActions(['initMusicData','getMusicData','getMusicDuration']),
+    canplay: debounce(function submit() {
+      let duration = this.$refs.audio.duration
+      // console.log("maudio duration ",duration);
+      this.getMusicDuration(duration)
+    },100),
+    updateTime: throttle(function dUpdate() { // currentTime是一个毫秒，节流以下
+      if(!this.$refs.audio) return ;
       this.$set(
-        this.$store.state.AUDIO.MUSIC,'duration',
-        this.$refs.audio.duration)
-    },
+        this.$store.state,'CURRENTTIME',
+        this.$refs.audio.currentTime
+      )
+    },1000),
+    
     async play(music) { // 通过判断参数music来判断是继续播放还是播放新歌曲
       if(!music) { // 参数为空，继续播放
         if(this.SRC === null) { // 如果已经不是初始化的url，默认不为null
@@ -79,19 +86,15 @@ export default {
           this.initMusicData()
         }else {
           this.$set(this.$store.state.AUDIO,'PAUSED',false)
-          this.$refs.audio.play() // 注意两个play方法是不一样的。
+          this.$refs.audio.play() // 注意两个play方法是不一样的
         }
         return 
       }
       this.pause() // 先暂停当前
-
-      let context = this
-      this.$refs.audio.addEventListener('canplay', 
-        debounce(function submit() {
-          // console.log(context)
-          context.getMusicData(music) // 提交数据 id title img src singer等
-        },300)()// 注意一定需要加上括号进行调用否则无法清除定时器
-      )
+      this.id = music.id // 新的音乐id
+      this.getMusicData(music) // 提交数据 id title img src singer等
+      /** 当能够播放的时候，canplay回进行监听 */
+      this.$refs.audio.load() // 重新加载
     },
     pause() {
       this.$refs.audio.pause()
@@ -106,7 +109,7 @@ export default {
       this.$set(this.$store.state.AUDIO,'LOOP',state)
     },
     async prev() { // 上一首 可以与next合并为一个函数
-      let index = 0, len = this.ML.length
+      let len = this.ML.length,index = len-1 // 注意蕴含的默认条件，当当前的歌曲不能播放时，播放的是列表中最后一首
       for (let i = 0; i < this.ML.length; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {
@@ -117,7 +120,7 @@ export default {
       this.play(this.ML[index])
     },
     async next() { // 下一首
-      let index = 0, len = this.ML.length
+      let len = this.ML.length,index = 0 // 注意蕴含条件，如果当前的歌曲不能播放，那么播放的是列表中的第一首
       for (let i = 0; i < this.ML.length; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {
@@ -131,19 +134,8 @@ export default {
       // console.log("%%%%%%",Math.floor(currentTime));
       this.$refs.audio.currentTime = Math.floor(currentTime)
       this.play();
-    } ,
-    canplay(){ 
-      // updateTime更新的有点频繁，可以在能够播放的时候，
-      // 给定一个当前的时间戳，其余的地方根据整个时间戳就能知道播放多少时间了，
-      // 但是又要注意暂停的问题，playing事件给出了比较好的解决方案
-      // 能够监听缓冲或者是暂停之后开始播放的事件
     },
-    updateTime: throttle(function dUpdate() { // currentTime是一个毫秒，节流以下
-      this.$set(
-        this.$store.state,'CURRENTTIME',
-        this.$refs.audio.currentTime.toFixed(6)
-      )
-    },1000)
+
   }
 }
 </script>

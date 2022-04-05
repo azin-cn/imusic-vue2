@@ -19,7 +19,7 @@ import MAudio from 'components/content/audio/MAudio'
 export default {
   name: 'App',
   data () {
-    return {  
+    return {
       transitionName: 'v',
       audio: null
     }

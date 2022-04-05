@@ -3,7 +3,8 @@ import {
   REC_DISCOVERD_DATA_SLIDE_BALL,
   REC_DISCOVERD_DATA_LATEST_MV,
   REC_INIT_MUSIC_DATA,
-  REC_MUSIC_DATA
+  REC_MUSIC_DATA,
+  REC_MUSIC_DURATION
  } from "./mutations_type"
 
 
@@ -29,5 +30,8 @@ export const mutations = {
     state.AUDIO.MUSIC = MUSIC
     state.AUDIO.PAUSED = !play
     if (flag) state.AUDIO.ML.push(music)
+  },
+  [REC_MUSIC_DURATION](state, {duration}) {
+    state.AUDIO.MUSIC.duration = duration
   }
 }

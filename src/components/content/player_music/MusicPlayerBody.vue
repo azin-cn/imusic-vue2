@@ -165,7 +165,7 @@ export default {
       let obj = this.handler_objs[index]
       /** 优先响应动画 */
       // let time = Date.now()
-      obj.style.transform = 'scale(1.2)'
+      obj.style.transform = 'scale(1.1)'
       let timer = setTimeout(() => {
         obj.style.transform = 'scale(1)' // TODO: 如果同时渲染transition和一个变化的东西是不会发生transition过渡的
         // console.log(Date.now() - time);
