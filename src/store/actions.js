@@ -167,7 +167,9 @@ export const actions = {
     
     resp = await reqMusicLyric(id)
     lyric = '未找到歌词~~'
-    if(resp.code !== 200) {
+    if(resp.code !== 200 || 
+      !resp || !resp.lrc || 
+      !resp.lrc.lyric) {
       console.log('actions 找不到歌词');
       // 进行提示，检查网络问题
     }else {
@@ -185,7 +187,7 @@ export const actions = {
     let flag = true  // 默认可以存入播放列表历史
     let ML = state.AUDIO.ML
     if(ML.length !==0 && ML[ML.length-1].id === music.id) {
-      console.log('重复点击了！不加入播放历史列表')
+      console.log('重复点击/播放了！不加入播放历史列表')
       flag = false
     }
     let play = music.src ? true : false // 是否为空

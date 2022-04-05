@@ -47,6 +47,7 @@ export default {
   methods: {
     changeIndex(index) {
       this.currentIndex = index
+      this.$emit('changeIndex',index)
     },
     slideDown() {
       // console.log('slideDown');
@@ -68,7 +69,7 @@ export default {
   color: #fff;
   // background-color: pink;
   .iconfont {
-    font-size: 20px;
+    font-size: 22px;
   }
 }
 .center{

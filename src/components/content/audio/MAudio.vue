@@ -76,7 +76,7 @@ export default {
         this.$store.state,'CURRENTTIME',
         this.$refs.audio.currentTime
       )
-    },1000),
+    },500),
     
     async play(music) { // 通过判断参数music来判断是继续播放还是播放新歌曲
       if(!music) { // 参数为空，继续播放
@@ -133,6 +133,7 @@ export default {
     async fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
       // console.log("%%%%%%",Math.floor(currentTime));
       this.$refs.audio.currentTime = Math.floor(currentTime)
+      console.log(this.AUDIO.MUSIC.lyric);
       this.play();
     },
 

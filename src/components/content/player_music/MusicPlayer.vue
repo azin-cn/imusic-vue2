@@ -2,11 +2,17 @@
   <div class="music-player" key="music-player">
     <div class="bg" :style="running_paused"></div>
 
+    <!-- 注意只是函数的引用地址，不是函数的返回值 -->
     <music-player-nav 
-      @slideDown="slideDown">
+      @slideDown="slideDown"
+      @changeIndex="changeIndex"
+    > 
     </music-player-nav>
 
-    <music-player-body :w="true"></music-player-body>
+    <music-player-body 
+      :w="true" 
+      :currentIndex="currentIndex"
+    ></music-player-body>
   </div>
 </template>
 
@@ -24,7 +30,7 @@ export default {
   data() {
     return {
       display: true,
-      // down: false
+      currentIndex: 1,
     }
   },
   computed: {
@@ -79,6 +85,9 @@ export default {
       // console.log("SlideDown");
       this.display = false
       this.$router.back() // this.$router.go(-1)
+    },
+    changeIndex(index) {
+      this.currentIndex = index
     }
   },
 }
@@ -94,6 +103,7 @@ export default {
   overflow: hidden;
   position: relative;
   z-index: 0;
+  height: 100vh;
   background-image: url('~assets/images/player-bgimg.jpg');
   // 毛玻璃效果，背景缩放效果
   .bg {
