@@ -135,8 +135,10 @@ export const actions = {
       duration: 0,
       lyric: null
     }
+    let PAUSED = true
     let CURRENTTIME = 0
-    commit(REC_INIT_MUSIC_DATA, {MUSIC,CURRENTTIME})
+    let ACTIVE_LYRIC = null
+    commit(REC_INIT_MUSIC_DATA, {MUSIC,PAUSED,CURRENTTIME,ACTIVE_LYRIC})
   },
 
   /**
@@ -145,7 +147,7 @@ export const actions = {
    * @returns 
    */
   async getMusicData({state,commit},music) {
-    const {id, title, img,singer} = music
+    const {id, title, img,singer,prev_next} = music
 
     /** duration 写在这，但是会有单独更新
      * 因为如果直接在这里通过new Audio的形式进行更新
@@ -158,7 +160,7 @@ export const actions = {
     let resp
 
     resp = await reqMusicUrl(id)
-    if(resp.code !== 200 || src === null) {
+    if(resp.code !== 200 || resp.data[0].url === null) {
       console.log('actions url获取失败');
       // 进行提示，检查版权，或者检查音乐版权
     }else {
@@ -186,12 +188,15 @@ export const actions = {
 
     let flag = true  // 默认可以存入播放列表历史
     let ML = state.AUDIO.ML
-    if(ML.length !==0 && ML[ML.length-1].id === music.id) {
+    if(!prev_next && ML.length !==0 
+      && ML[ML.length-1].id === music.id) { // 只有不是通过next和prev的才能进行提示
       console.log('重复点击/播放了！不加入播放历史列表')
       flag = false
     }
-    let play = music.src ? true : false // 是否为空
-    flag = flag && play ? true : false // 
+    let play = src ? true : false // 是否为空，为空不播放
+    flag = prev_next ? false : true // 通过prev和next进行的不加入
+    flag = flag && play ? true : false // 为空不加入，通过prev和next的不加入
+    // console.log("播放？ = ",play ? '播放' : '暂停');
     // console.log(state.AUDIO);
     commit(REC_MUSIC_DATA,{MUSIC, play, flag, music})
   },
@@ -203,6 +208,6 @@ export const actions = {
    */
   async getMusicDuration({commit},duration) {
     commit(REC_MUSIC_DURATION,{duration})
-  }
+  },
 
 }

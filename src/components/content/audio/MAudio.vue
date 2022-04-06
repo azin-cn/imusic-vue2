@@ -10,7 +10,7 @@
     <audio 
       id="audio" ref="audio" 
       :src="SRC" :paused="PAUSED"
-      :loop="LOOP"
+      :loop="LOOP" @duratonchange="durationchange"
       @timeupdate="updateTime"
       @ended="ended" @canplay="canplay"
       autoplay preload>
@@ -45,7 +45,8 @@ export default {
       return this.AUDIO.ML
     },
     PAUSED() {
-      return this.AUDIO.PAUSED
+      // console.log("世界你好 暂停？=",this.AUDIO.PAUSED);
+      return this.AUDIO.PAUSED || !this.SRC
     },
     SRC() {
       // this.$refs.audio.load() //不能写在这，否则无法加载组件，因为会引发循环
@@ -69,13 +70,19 @@ export default {
       let duration = this.$refs.audio.duration
       // console.log("maudio duration ",duration);
       this.getMusicDuration(duration)
-    },100),
+    },80),
+    durationchange() { // 更新状态
+      let duration = this.$refs.audio.duration
+      // console.log("maudio duration ",duration);
+      this.getMusicDuration(duration)
+    },
     updateTime: throttle(function dUpdate() { // currentTime是一个毫秒，节流以下
       if(!this.$refs.audio) return ;
       this.$set(
         this.$store.state,'CURRENTTIME',
-        this.$refs.audio.currentTime
+        parseFloat(this.$refs.audio.currentTime)
       )
+      // console.log(this.$refs.audio.currentSrc);
     },500),
     
     async play(music) { // 通过判断参数music来判断是继续播放还是播放新歌曲
@@ -90,9 +97,10 @@ export default {
         }
         return 
       }
-      this.pause() // 先暂停当前
+      // console.log("maudio 新歌曲");
+      // this.pause() // 先暂停当前，但是交互效果回很突兀
       this.id = music.id // 新的音乐id
-      this.getMusicData(music) // 提交数据 id title img src singer等
+      await this.getMusicData(music) // 提交数据 id title img src singer等
       /** 当能够播放的时候，canplay回进行监听 */
       this.$refs.audio.load() // 重新加载
     },
@@ -110,32 +118,34 @@ export default {
     },
     async prev() { // 上一首 可以与next合并为一个函数
       let len = this.ML.length,index = len-1 // 注意蕴含的默认条件，当当前的歌曲不能播放时，播放的是列表中最后一首
-      for (let i = 0; i < this.ML.length; i++) {
+      for (let i = 0; i < len; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {
           index = i===0 ? len-1 : i-1
           break
         }
       }
+      this.ML[index].prev_next = true
       this.play(this.ML[index])
     },
     async next() { // 下一首
       let len = this.ML.length,index = 0 // 注意蕴含条件，如果当前的歌曲不能播放，那么播放的是列表中的第一首
-      for (let i = 0; i < this.ML.length; i++) {
+      for (let i = 0; i < len; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {
           index = i===len-1 ? 0 : i+1
           break
         }
       }
+      this.ML[index].prev_next = true
       this.play(this.ML[index])
     },
-    async fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
+    fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
       // console.log("%%%%%%",Math.floor(currentTime));
-      this.$refs.audio.currentTime = Math.floor(currentTime)
-      console.log(this.AUDIO.MUSIC.lyric);
+      this.$refs.audio.currentTime = currentTime
       this.play();
     },
+
 
   }
 }

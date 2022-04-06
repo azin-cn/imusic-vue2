@@ -5,13 +5,15 @@
     <!-- 注意只是函数的引用地址，不是函数的返回值 -->
     <music-player-nav 
       @slideDown="slideDown"
+      :currentIndex="currentIndex"
       @changeIndex="changeIndex"
-    > 
+    >
     </music-player-nav>
 
     <music-player-body 
-      :w="true" 
+      :w="true"
       :currentIndex="currentIndex"
+      @changeIndex="changeIndex"
     ></music-player-body>
   </div>
 </template>
@@ -87,6 +89,7 @@ export default {
       this.$router.back() // this.$router.go(-1)
     },
     changeIndex(index) {
+      // console.log("index",index);
       this.currentIndex = index
     }
   },
@@ -110,7 +113,7 @@ export default {
     position: absolute;
     z-index: -1;
     top: 0; right: 0; bottom: 0; left: 0; // 铺满整个父元素
-    filter: blur(10px);
+    filter: blur(12px);
     background: url('~assets/images/player-bgimg.jpg') rgba(0, 0, 0, .6);
     // background-size: cover;
     background-size: 100% 100%;

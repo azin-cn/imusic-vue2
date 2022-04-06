@@ -8,6 +8,19 @@ Vue.config.productionTip = false;
 
 import 'assets/css/base.css'
 
+
+String.prototype.trim=function(){undefined
+  return this.replace(/(^\s*)|(\s*$)/g, "");
+}
+String.prototype.ltrim=function(){undefined
+  return this.replace(/(^\s*)/g,"");
+}
+String.prototype.rtrim=function(){undefined
+  return this.replace(/(\s*$)/g,"");
+}
+
+
+
 // import 'assets/icon/discover/iconfont.css'
 Vue.use(VueLazyload)
 

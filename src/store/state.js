@@ -31,5 +31,6 @@ export const state = {
       lyric: null,
     }
   },
+  ACTIVE_LYRIC : null,
   CURRENTTIME:0,
 }

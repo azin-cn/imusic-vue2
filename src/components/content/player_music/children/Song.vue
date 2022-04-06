@@ -21,7 +21,7 @@
 
     <!-- 音乐歌词 -->
     <div class="lyric-inline padding12px">
-      <span> 在一瞬间 </span>
+      <span > {{active_lyric}} </span>
     </div>
 
     <!-- 更多操作 -->
@@ -60,10 +60,12 @@ export default {
       more_actions: 
         ['icon-sing','icon-yinxiao',
         'icon-xiazai','icon-xiaoxi1','icon-shudian'],
+      pcbar: null,
     }
   },
   props: {
-    AUDIO: {type: Object, default() {return {}}}
+    AUDIO: {type: Object, default() {return {}}},
+    
   },
   computed: {
     LOOP(){
@@ -86,8 +88,11 @@ export default {
       if(second < 10) second = '0'.concat(second)
       return minute+':'+second
     },
+    curr() {
+      return this.$store.state.CURRENTTIME
+    },
     currentTime() { // 已播放时长计算
-      let curr =  this.$store.state.CURRENTTIME
+      let curr =  this.curr
       if(!this.$store.state.CURRENTTIME) {
         return '00:00'
       }
@@ -99,21 +104,23 @@ export default {
       return `${minute}:${second}`
     },
     pctbarw() { // 计算当前移动条宽度
-      let pcbar = document.querySelector('.pct-bar')
       let width = null
-      if(pcbar) width = pcbar.offsetWidth // 增加组件的判断选项，否则在组建失活时会报错
+      if(this.pcbar) width = this.pcbar.offsetWidth // 增加组件的判断选项，否则在组建失活时会报错
       // console.log('width',width);
       return width || 'width: 0px;'
     },
     gogo() { // 对进度条进行调整
-      let curr =  this.$store.state.CURRENTTIME
-      let duration = this.MUSIC.duration
+      let curr = this.curr
+      let duration = this.$store.state.AUDIO.MUSIC.duration
       if(!curr || !duration) return '0px' // 默认返回值
       let pct = Math.floor(curr / duration * 1000) // 精细化
       // console.log(pct);
       let width = 'width:' + ( this.pctbarw * pct / 1000 ) + 'px;'
       // console.log(width);
       return width
+    },
+    active_lyric() {
+      return this.$store.state.ACTIVE_LYRIC || '在一瞬间~'
     },
     cover_img() {
       return this.MUSIC.img
@@ -127,15 +134,29 @@ export default {
       return res
     },
   },
+  watch: {
+    curr: {
+      immediate: true,
+      deep: true,
+      handler() {}
+    }
+  },
+  mounted() {
+    this.pcbar = document.querySelector('.pct-bar')
+  },
+
   methods: {
     pct_move: debounce(function dmove(e) {
       // console.log(e.offsetX); // 计算的正确距离
       let x = e.offsetX // 点击的位置
       let w = this.pctbarw // 进度条总宽度
       let duration = this.MUSIC.duration // 总时长
-      if(isNaN(duration)) return;
+      if(isNaN(duration)){ // 如果出现的数字时NaN，那么重新调用canplay方法得到duration
+        this.$audio.canplay()
+        return ;
+      }
       let pct = Math.floor(x / w * 1000) // 得到占比，乘上1000提高精度
-      let currentTime = Math.floor(pct * duration / 1000)
+      let currentTime = parseFloat(pct * duration / 1000)
       this.$audio.fastSeek(currentTime)
     },300)
   }
@@ -225,6 +246,11 @@ export default {
   line-height: 32px;
   font-size: 16px;
   color: #dee8ed;
+
+  span {
+    display: inline-block;
+    transition: all .6s linear;
+  }
 }
 
 .more-action {

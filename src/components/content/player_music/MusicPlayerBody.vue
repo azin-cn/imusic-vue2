@@ -1,14 +1,28 @@
 <template>
-  <div :class="{'music-player-body':true,w:w}">
+  <div 
+    :class="{'music-player-body':true,w:w}"
+    @touchstart="touchstart($event)"
+    @touchend="touchend($event)"
+  >
 
-    <song 
-      v-if="currentIndex === 1"
-      :AUDIO="AUDIO"
-    ></song>
+    <transition :name="slide_name" key="slide_song" mode="in-out">
+      <song 
+        v-show="currentIndex === 1"
+        :AUDIO="AUDIO"
+      ></song>
+    </transition>
 
-        <!-- 播放相关操作 -->
-    <div class="play-handler padding12px">
-
+    <transition :name="slide_name" key="slide_lyric" mode="in-out">
+      <lyric
+        v-show="currentIndex === 2"
+        :MUSIC="MUSIC"
+        :touch="touch"
+        :distanceY="distanceY"
+      >
+      </lyric>
+    </transition>
+    <!-- 播放相关操作 -->
+    <div class="play-handler ">
       <div class="handlers">
         <span v-for="(handler_icon,index) in handler_icons" :key="index"
           :class="'handler iconfont  ' + handler_icon"
@@ -26,12 +40,23 @@ import { mapActions } from 'vuex'
 
 /** children area */
 import Song from './children/Song'
+import Lyric from './children/Lyric'
 
 export default {
   name: 'MusicPlayerBody',
   components: {
     Song,
-
+    Lyric
+  },
+  data() {
+    return {
+      touch: false,
+      startX: 0,
+      startY: 0,
+      endX: 0,
+      endY: 0,
+      slide_name: 'slide-left',
+    }
   },
   props: {
     w: {
@@ -67,6 +92,12 @@ export default {
     handler_objs() {
       return document.querySelectorAll('.handler')
     },
+    distanceX() {
+      return parseInt(this.endX - this.startX)
+    },
+    distanceY() {
+      return parseInt(this.endY - this.startY)
+    },
 
   },
   watch: {
@@ -75,6 +106,19 @@ export default {
       deep: true,
       handler() {}
     },
+    'currentIndex': {
+      immediate: true,
+      deep: true,
+      handler(newVal, oldVal) {
+        let name;
+        if(newVal > oldVal) { // 如果出现的是左滑动+1情况
+          name = 'slide-right'
+        }else if(newVal < oldVal) { // 如果出现的是右滑动-1的情况
+          name = 'slide-left'
+        }else return ;
+        this.slide_name = name
+      }
+    }
   },
   methods: {
     ...mapActions(['initMusicData']),
@@ -97,7 +141,7 @@ export default {
           // 每次去相反的数据即可
           state = !this.$store.state.AUDIO.LOOP
           this.$set(this.$store.state.AUDIO,'LOOP',state)
-          className += this.LOOP ? 
+          className += state ? 
             'icon-danquxunhuan' : 'icon-liebiaoxunhuan'
           obj.className = className
           break;
@@ -105,7 +149,7 @@ export default {
           this.$audio.prev()
           break;
         case 2:
-          if(this.MUSIC.src === null) { // 如果url为空不允许点击按钮
+          if(!this.MUSIC.src) { // 如果url为空不允许点击按钮 更新：要同时判断undefined
             this.$audio.pause()
             console.log("Body src null");
             this.initMusicData()
@@ -119,11 +163,8 @@ export default {
           }else {
             this.$audio.play()
           }
-          if(this.isplaying) { // 通过判断是否播放了音乐对按钮进行控制
-            className += 'icon-play-music'
-          }else {
-            className += 'icon-stop-music'
-          }
+          className += this.isplaying ?
+            'icon-play-music' : 'icon-stop-music'
           obj.className = className
           break
         case 3:
@@ -133,6 +174,46 @@ export default {
           break;
       }// switch end
     }, 
+    touchstart(e) {
+      // e.preventDefault();
+      // console.log("touchstart",e);
+      this.touch = true
+      this.startX = e.touches[0].pageX;
+      this.startY = e.touches[0].pageY;
+      // console.log("startX",this.startX);
+    },
+    touchend(e) {
+      // e.preventDefault();
+      // console.log("touchend",e);
+      this.touch = false
+      this.endX = e.changedTouches[0].pageX
+      this.endY = e.changedTouches[0].pageY;
+      this.slide_left_right()
+      this.slide_up_down()
+    },
+    slide_up_down() { // 更新移交给Lyric自行判断，将dy传入即可
+      if(this.currentIndex !==2 ) return ; // 只有在歌词上下滑动才会有右效果
+      // console.log(this.distanceY);
+      
+    },
+    slide_left_right() {
+      let curr = 0
+      if(this.distanceX < -80){
+        // console.log('往左滑动+1');
+        curr = this.currentIndex === 2 ? 2 : this.currentIndex+1
+      }else if(this.distanceX > 80){
+        // console.log("往右滑动-1")
+        curr = this.currentIndex === 0 ? 0 : this.currentIndex-1
+      }else {
+        return ;
+      }
+      this.startX = this.startY = this.endX = this.endY = 0
+      this.changeIndex(curr); // 调用发送函数，让父组件更新状态，以便于props同步状态
+    },
+
+    changeIndex(index){
+      this.$emit('changeIndex',index)
+    },
   }
 }
 </script>
@@ -152,22 +233,20 @@ export default {
   height: calc(100vh - 48px);
 }
 
-.padding12px {
-  padding: 0 12px;
-}
-
 .play-handler {
-  padding: 0 12px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 36px);
+  height: 62px;
+  line-height: 62px;
 }
-
-
 
 .handlers {
   display: flex;
   justify-content: space-between;
-  height: 62px;
-  line-height: 62px;
-  margin-top: 6px;
+
   .handler {
     transition: all .1s;
   }
@@ -179,4 +258,35 @@ export default {
     font-size: 48px;
   }
 }
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all .6s;
+}
+
+.slide-left-enter,
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-50vh) rotate(20deg) scale(1.2);
+}
+
+.slide-left-enter-to,
+.slide-left-leave {
+  opacity: 1;
+  transform: translateX(0) rotate(0deg) scale(1);
+}
+
+.slide-right-enter,
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(50vh) rotate(-20deg) scale(1.2); // 旋转和缩放
+}
+.slide-right-enter-to,
+.slide-right-leave {
+  opacity: 1;
+  transform: translateX(0) rotate(0deg) scale(1); 
+}
+
 </style>

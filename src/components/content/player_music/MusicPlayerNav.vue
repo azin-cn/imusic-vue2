@@ -34,9 +34,14 @@ export default {
   },
   data() {
     return {
-      currentIndex: 1,
       shark: false, // 抖动
       display: true
+    }
+  },
+  props: {
+    currentIndex: {
+      type: Number,
+      default: 1
     }
   },
   computed: {
@@ -46,7 +51,6 @@ export default {
   },
   methods: {
     changeIndex(index) {
-      this.currentIndex = index
       this.$emit('changeIndex',index)
     },
     slideDown() {
