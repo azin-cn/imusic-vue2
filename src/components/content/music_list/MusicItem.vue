@@ -1,6 +1,7 @@
 <template>
   <div class="music-item">
     <slot></slot>
+    <slot name="isEmpty"></slot>
     <span v-if="!isEmpty" class="ml-play-btn iconfont icon-stop-music"></span>
   </div>
 </template>
@@ -31,6 +32,7 @@ export default {
   line-height: 44px;
   font-size: 16px;
   .ml-play-btn {
+    color: #E53008;
     font-size: 20px;
   }
 }

@@ -85,6 +85,9 @@ export default {
     AUDIO() {
       return this.$store.state.AUDIO
     },
+    LOOP(){
+      return this.AUDIO.LOOP
+    },
     MUSIC() {
       return this.AUDIO.MUSIC
     },

@@ -100,7 +100,7 @@ export default {
   methods: {
     ...mapActions(['initMusicData']),
     to_player(e){
-      console.log(e.target);
+      // console.log(e.target);
       this.$router.push('/musicplayer')
     },
     play_stop(e) {

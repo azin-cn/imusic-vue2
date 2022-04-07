@@ -194,9 +194,9 @@ export const actions = {
       flag = false
     }
     let play = src ? true : false // 是否为空，为空不播放
-    flag = prev_next ? false : true // 通过prev和next进行的不加入
-    flag = music_list ? false : true // 如果是通过播放列表不加入
-    flag = flag && play ? true : false // 为空不加入，通过prev和next的不加入
+    flag &= !prev_next // 通过prev和next进行的不加入
+    flag &= !music_list // 如果是通过播放列表不加入
+    flag &= play // 为空不加入，通过prev和next的不加入
     // console.log("播放？ = ",play ? '播放' : '暂停');
     // console.log(state.AUDIO);
     commit(REC_MUSIC_DATA,{MUSIC, play, flag, music})

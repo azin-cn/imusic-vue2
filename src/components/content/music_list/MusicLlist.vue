@@ -1,24 +1,34 @@
 <template>
   <div class="music-list" 
-    @click.stop="ml_click($event)"
+    @click.self="mask_click($event)"
   >
     <div class="music-list-area w" ml-list="ml-list">
       <!-- 头部提示区域 -->
       <div class="music-list-head">
-        <span class="iconfont icon-liebiaoxunhuan"></span>
-        <span class="title">列表循环({{MLlength}}首)</span>
+        <span @click="func_loop" 
+          :class="{'iconfont':true,
+          'icon-liebiaoxunhuan':!LOOP,
+          'icon-danquxunhuan': LOOP}">
+        </span>
+        <span v-if="!LOOP" class="title">列表循环({{MLlength}}首)</span>
+        <span v-if="LOOP" class="title">单曲循环({{MLlength}}首)</span>
       </div>
 
+      <!-- :class="{'ml-list-item-active':currentIndex===index}" -->
       <div class="music-list-body">
-        <music-item :isEmpty="isEmpty"
-          v-for="(music,index) in ML" :key="'ml_'+music.id+music.title+index"
-          :data-ml-music-id="music.id"
-          :data-ml-music-title="music.title"
-          :data-ml-music-img="music.img"
-        >
-          {{music.title}}
-          <span v-if="!music.title">{{music}}</span>
-        </music-item>
+        <div class="slide-ml-list" @click="toPlayer($event)">
+          <music-item :isEmpty="isEmpty"
+            v-for="(music,index) in ML" 
+            :key="'ml_'+music.id+music.title+index"
+            :data-ml-music-id="music.id"
+            :data-ml-music-title="music.title"
+            :data-ml-music-img="music.img"
+            :data-ml-music-index="index"
+          >
+            {{music.title}}
+          </music-item>
+          <span v-if="isEmpty">还未有歌曲哦~ | 在一瞬间~</span>
+        </div>
       </div>
 
     </div>
@@ -36,20 +46,26 @@ export default {
   },
   data() {
     return {
+      currentIndex: 0
     }
   },
   computed: {
     ML(){
       let ml = this.$store.state.AUDIO.ML
-      ml = ml.length===0 ? ['还未有歌曲哦~ | 在一瞬间~'] : ml
-      // console.log(ml);
       return  ml
     },
+    LOOP() {
+      let loop = this.$store.state.AUDIO.LOOP
+      return loop || false
+    },
     isEmpty() {
-      return this.ML.includes('还未有歌曲哦~ | 在一瞬间~')
+      return this.ML.length===0
     },
     MLlength() {
       return this.isEmpty ? 0 : this.ML.length
+    },
+    ml_list_item_active() {
+      
     }
   },
   watch: {
@@ -57,15 +73,17 @@ export default {
       immediate: true,
       deep: true,
       handler() {}
+    },
+    LOOP:{
+      immediate: true,
+      deep: true,
+      handler() {}
     }
   },
   methods: {
-    ml_click(e) {
-      
+    mask_click(e) {   
       let target = e.target
       let blurClassName = 'music-list'
-
-      // console.log(target);
       let classList = target.classList
       if(classList.contains(blurClassName)) { 
         /**
@@ -83,14 +101,26 @@ export default {
         this.toBlur()
         return ;
       }
+      // console.log(target);
+    },
+    func_loop() {
+      let state = !this.$store.state.AUDIO.LOOP
+      this.$set(
+        this.$store.state.AUDIO,'LOOP',
+        state
+      )
+    },
+    toPlayer(e) {
+      let target = e.target
       let music = {}
-      let attr = ['data-ml-music-id','data-ml-music-title','data-ml-music-img']
+      let attr = ['data-ml-music-id','data-ml-music-title','data-ml-music-img','data-ml-music-index']
       while(target){ // 当不是空对象的时候
         if(target.classList.contains('music-list-area')) break;
         if(target.hasAttribute(attr[0])){
           music.id = target.getAttribute(attr[0])
           music.title = target.getAttribute(attr[1])
           music.img = target.getAttribute(attr[2])
+          this.currentIndex = target.getAttribute(attr[3])
           music.music_list = true
           this.toBlur()
           this.$audio.play(music)
@@ -98,7 +128,6 @@ export default {
         }
         target = target.parentNode
       }
-      // console.log(target);
     },
     toBlur() {
       this.$emit('toBlur')
@@ -143,5 +172,17 @@ export default {
     font-size:18px;
   }
 }
-
+.music-list-body {
+  height: 354px;
+  overflow-y: scroll;
+  // 隐藏滚动条
+  -ms-overflow-style: none;
+  overflow: -moz-scrollbars-none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+.ml-list-item-active {
+  color: #E53008;
+}
 </style>
