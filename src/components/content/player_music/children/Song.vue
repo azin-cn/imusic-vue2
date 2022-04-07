@@ -54,6 +54,7 @@ import { debounce } from '@/components/common/debounce/debounce'
 
 export default {
   name: 'Song',
+  
   data() {
     return {
       more_titles: ['一起唱','音效','下载','评论','更多'],

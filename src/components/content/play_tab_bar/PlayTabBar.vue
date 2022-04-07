@@ -1,7 +1,9 @@
 <template> <!--阻止事件捕获和阻止事件冒泡-->
-  <div class="play-tab-bar" @click="to_player">
+  <div class="play-tab-bar" @click.self="to_player">
     <nav-bar class="nav-bar" rwidth="90px">
-      <div class="left" slot="left">
+
+      <div @click="to_player"
+        class="left" slot="left">
         <div class="record-img">
           <img src="~assets/images/record.png" alt=""
             class="playing-rotate"
@@ -10,11 +12,14 @@
         </div>
       </div>
 
-      <div class="center" :style="running_paused" slot="center">
+      <div
+        class="center" :style="running_paused" slot="center">
         <div 
+          @click="to_player"
           :class="{'playing-slide-words': isPlaying}"
         >
-          {{title}}
+         <div v-if="!active_lyric"> {{title}} <!--歌曲名和歌词的显示区域--></div>
+         <div v-if="active_lyric"> {{active_lyric}} <!--歌曲名和歌词的显示区域--></div>
         </div>
       </div>
         
@@ -31,23 +36,36 @@
         </span>
       </div>
     </nav-bar>
+
+    <transition key="play_tab_bar_music_list" mode="out-in" name="slide-up-down">
+      <music-list 
+        v-if="ml_list_display"
+        class="play-tab-bar-music-list"
+        @toBlur="toBlur"
+      >
+        
+      </music-list>
+    </transition>
   </div>
 </template>
 
 <script>
 
 import NavBar from 'components/common/nav_bar/NavBar'
-import { mapActions, mapState } from 'vuex'
+import { mapActions } from 'vuex'
+
+import MusicList from '../music_list/MusicLlist'
 
 export default {
   name: 'PlayTabBar',
+  components: {
+    NavBar,
+    MusicList
+  },
   data() {
     return {
-      
+      ml_list_display: false
     }
-  },
-  components: {
-    NavBar
   },
   computed: {
     AUDIO() {
@@ -59,6 +77,9 @@ export default {
     title() {
       return this.MUSIC.title || '暂未播放歌曲，快去选一首吧~'
     },
+    active_lyric() {
+      return this.$store.state.ACTIVE_LYRIC
+    },
     isPlaying() {
       return !this.AUDIO.PAUSED
     },
@@ -66,7 +87,8 @@ export default {
       let state = this.isPlaying ? 'running' : 'paused'
       let res = 'animation-play-state: '.concat(state,';')
       return res
-    }
+    },
+
   },
   watch: {
     'AUDIO' : {
@@ -77,11 +99,12 @@ export default {
   },
   methods: {
     ...mapActions(['initMusicData']),
-    to_player(){
+    to_player(e){
+      console.log(e.target);
       this.$router.push('/musicplayer')
     },
     play_stop(e) {
-      if(this.MUSIC.src === null) { // 如果url为空不允许点击按钮
+      if(!this.MUSIC.src) { // 如果url为空不允许点击按钮，更新，只有同时判断undefined和null才是正确的。
         this.$audio.pause()
         this.initMusicData()
         console.log("tab src null");
@@ -101,6 +124,7 @@ export default {
     show_music_list(e) {
       let obj = e.target
       this.scale_icon(obj)
+      this.ml_list_display = true
     },
     scale_icon(obj) {
       obj.style.transform = 'scale(1.1)'
@@ -108,6 +132,11 @@ export default {
         obj.style.transform = 'scale(1)'
         clearTimeout(timer)
       }, 80);
+    },
+    /* 播放列表的显示 */
+    toBlur() {
+      // console.log("play tab bar blur");
+      this.ml_list_display = false
     }
   }
 }
@@ -212,4 +241,25 @@ export default {
     transform: translateZ(10px) rotateX(-360deg) ;
   }
 }
+
+.play-tab-bar-music-list {
+  transform: translateY(-90vh);
+}
+
+
+// 动画都是对称的，将进入的动画写好了之后可以直接协商reverse
+.slide-up-down-enter,.slide-up-down-leave-to {
+  // slide-up slide-down
+  opacity: 0;
+  transform: translateY(0);
+}
+.slide-up-down-enter-active, .slide-up-down-leave-active {
+  transition: all .6s cubic-bezier(.52,.01,0,1.13);
+}
+.slide-up-down-leave,.slide-up-down-enter-to {
+  // slide-up slide-down
+  opacity: 1;
+  transform: translateY(-90vh);
+}
+
 </style>

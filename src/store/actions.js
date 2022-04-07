@@ -147,7 +147,7 @@ export const actions = {
    * @returns 
    */
   async getMusicData({state,commit},music) {
-    const {id, title, img,singer,prev_next} = music
+    const {id, title, img,singer,prev_next,music_list} = music
 
     /** duration 写在这，但是会有单独更新
      * 因为如果直接在这里通过new Audio的形式进行更新
@@ -195,6 +195,7 @@ export const actions = {
     }
     let play = src ? true : false // 是否为空，为空不播放
     flag = prev_next ? false : true // 通过prev和next进行的不加入
+    flag = music_list ? false : true // 如果是通过播放列表不加入
     flag = flag && play ? true : false // 为空不加入，通过prev和next的不加入
     // console.log("播放？ = ",play ? '播放' : '暂停');
     // console.log(state.AUDIO);

@@ -118,6 +118,7 @@ export default {
     },
     async prev() { // 上一首 可以与next合并为一个函数
       let len = this.ML.length,index = len-1 // 注意蕴含的默认条件，当当前的歌曲不能播放时，播放的是列表中最后一首
+      if(len===0) {console.log("列表为空"); return ;}
       for (let i = 0; i < len; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {
@@ -130,6 +131,7 @@ export default {
     },
     async next() { // 下一首
       let len = this.ML.length,index = 0 // 注意蕴含条件，如果当前的歌曲不能播放，那么播放的是列表中的第一首
+      if(len===0) {console.log("列表为空"); return ;}
       for (let i = 0; i < len; i++) {
         let ml = this.ML[i]
         if(ml.id === this.id) {

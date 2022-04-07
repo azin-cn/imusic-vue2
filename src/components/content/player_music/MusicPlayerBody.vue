@@ -30,6 +30,16 @@
         ></span>
       </div>
     </div>
+    
+    <transition key="music_playe_body_music_list" mode="out-in" name="slide-up-down">
+      <music-list 
+        v-if="ml_list_display"
+        @toBlur="toBlur"
+      >
+        
+      </music-list>
+    </transition>
+
   </div>
 </template>
 
@@ -37,6 +47,7 @@
 <script>
 import { mapActions } from 'vuex'
 
+import MusicList from '../music_list/MusicLlist'
 
 /** children area */
 import Song from './children/Song'
@@ -46,7 +57,8 @@ export default {
   name: 'MusicPlayerBody',
   components: {
     Song,
-    Lyric
+    Lyric,
+    MusicList
   },
   data() {
     return {
@@ -56,6 +68,7 @@ export default {
       endX: 0,
       endY: 0,
       slide_name: 'slide-left',
+      ml_list_display: false
     }
   },
   props: {
@@ -171,6 +184,8 @@ export default {
           this.$audio.next()
           break;
         case 4:
+          this.ml_list_display = true
+          // console.log(this.ml_list_display);
           break;
       }// switch end
     }, 
@@ -194,7 +209,6 @@ export default {
     slide_up_down() { // 更新移交给Lyric自行判断，将dy传入即可
       if(this.currentIndex !==2 ) return ; // 只有在歌词上下滑动才会有右效果
       // console.log(this.distanceY);
-      
     },
     slide_left_right() {
       let curr = 0
@@ -210,10 +224,14 @@ export default {
       this.startX = this.startY = this.endX = this.endY = 0
       this.changeIndex(curr); // 调用发送函数，让父组件更新状态，以便于props同步状态
     },
-
     changeIndex(index){
       this.$emit('changeIndex',index)
     },
+
+    /* 播放列表的显示 */
+    toBlur() {
+      this.ml_list_display = false
+    }
   }
 }
 </script>
@@ -288,5 +306,21 @@ export default {
   opacity: 1;
   transform: translateX(0) rotate(0deg) scale(1); 
 }
+
+// 动画都是对称的，将进入的动画写好了之后可以直接协商reverse
+.slide-up-down-enter,.slide-up-down-leave-to {
+  // slide-up slide-down
+  opacity: 0;
+  transform: translateY(100vh);
+}
+.slide-up-down-enter-active, .slide-up-down-leave-active {
+  transition: all .6s cubic-bezier(.52,.01,0,1.13);
+}
+.slide-up-down-leave,.slide-up-down-enter-to {
+  // slide-up slide-down
+  opacity: 1;
+  transform: translateY(0);
+}
+
 
 </style>
