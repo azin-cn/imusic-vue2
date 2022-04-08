@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import {debounce} from 'components/common/debounce/debounce'
+
 import NavBar from 'components/common/nav_bar/NavBar'
 
 export default {
@@ -53,10 +55,9 @@ export default {
     changeIndex(index) {
       this.$emit('changeIndex',index)
     },
-    slideDown() {
-      // console.log('slideDown');
+    slideDown: debounce(function dSlideDown() {
       this.$emit('slideDown')
-    }
+    },180)
   }
 }
 </script>

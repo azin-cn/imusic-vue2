@@ -66,9 +66,6 @@ export default {
     lyric_list() {
       return this.time_lyric.lyrics
     },
-    lis() {
-      return document.querySelectorAll('li')
-    }
   },
   watch: {
     '$store.state.CURRENTTIME': {
