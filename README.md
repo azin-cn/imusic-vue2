@@ -133,6 +133,21 @@ fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接
 - 进度条的实时移动，并且对应的容错措施，包括浮点数的无限循环和NaN等
 - 歌词的实时滚动，通过offsetTop, scrollTo实现，包括对应位置计算。给每一个li设定等高的高度，方便计算。如果还需要考虑换行的歌词，那么此时设置padding即可撑开，设置行距让换行的元素靠近，设置padding让不同行的元素远离。
 
+#### audio标签
+
+```html
+<audio 
+       id="audio" ref="audio" 
+       :src="SRC" :paused="PAUSED"
+       :loop="LOOP" @duratonchange="durationchange"
+       @timeupdate="updateTime"
+       @ended="ended" @canplay="canplay"
+       autoplay preload>
+</audio>
+```
+
+#### AUDIO对象方法
+
 ```javascript
 fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
   // console.log("%%%%%%",Math.floor(currentTime));
