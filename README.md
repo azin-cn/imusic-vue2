@@ -106,6 +106,70 @@ fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接
 
 > 如果未声明引用的css文件，默认纯手写css
 
-- 用户点击播放，跳转播放器播放音乐，实现过渡动效，加入播放历史列表
+- 用户点击播放，跳转播放器播放音乐，实现过渡动效，加入播放历史列表，事件监听
+- 播放页面唱片机效果
 - 播放历史，点击播放历史列表中的歌曲不会重新加入播放历史列表
-- 
+- 首页轮播图，使用swiper实现
+- 进度条实时更新，通过AUDIO对象的属性currentTime进行更新，利用了节流函数
+- 时间实时更新，同理通过AUDIO对象的属性currentTIme进行同步更新，利用节流函数
+- 播放歌曲/歌曲封面旋转/歌曲歌词实时滚动
+- 单曲循环，列表循环，上一首，下一首
+    - 如果列表中只有一首歌曲，那么就是上一首和下一首都是一样
+    - 点击播放历史列表的歌曲不会重复加入播放历史列表中
+    - 播放历史列表中可以直接设置单曲/列表播放，并且数据同步更新到播放器主页面中。
+    - 当当前的歌曲播放完成后，AUDIO对象自动触发end函数，检测是否为循环播放，判断检测结果，进行循环 / 单曲操作
+- 获取用户的歌单基本信息/歌曲
+- 首页，进行了分页操作
+- 热门话题
+- 云村日历
+- 歌单广场
+- 更多音乐
+- 每日推荐
+
+### 项目难点
+
+- 通过一个AUDIO实例对象，完成数据的状态共享。
+- 进度条的实时滚动，通过总的时长duration，和当前已播放的歌曲时长currentTime进行比例计算得到一个占比，最后乘上当前进度条的宽度，最后能够得到当前的距离。同时进行过渡的设定。优化：每次更新挪动等间隔的距离，能够降低计算的次数提高性能。因为每次一的更新都是固定的，不需要重复计算当前的距离，但是要注意，如果中途更换了歌曲。那么此时的进度条应该要重置。
+- 进度条的实时移动，并且对应的容错措施，包括浮点数的无限循环和NaN等
+- 歌词的实时滚动，通过offsetTop, scrollTo实现，包括对应位置计算。给每一个li设定等高的高度，方便计算。如果还需要考虑换行的歌词，那么此时设置padding即可撑开，设置行距让换行的元素靠近，设置padding让不同行的元素远离。
+
+```javascript
+fastSeek(currentTime){ // 在音频播放器中指定播放时间(封装) 直接设定currentTime
+  // console.log("%%%%%%",Math.floor(currentTime));
+  this.$refs.audio.currentTime = currentTime
+  this.play();
+}
+async prev() { // 上一首 可以与next合并为一个函数
+  let len = this.ML.length,index = len-1 // 注意蕴含的默认条件，当当前的歌曲不能播放时，播放的是列表中最后一首
+  if(len===0) {console.log("列表为空"); return ;}
+  for (let i = 0; i < len; i++) {
+    let ml = this.ML[i]
+    if(ml.id === this.id) {
+      index = i===0 ? len-1 : i-1
+      break
+    }
+  }
+  this.ML[index].prev_next = true
+  this.play(this.ML[index])
+}
+async next() { // 下一首
+  let len = this.ML.length,index = 0 // 注意蕴含条件，如果当前的歌曲不能播放，那么播放的是列表中的第一首
+  if(len===0) {console.log("列表为空"); return ;}
+  for (let i = 0; i < len; i++) {
+    let ml = this.ML[i]
+    if(ml.id === this.id) {
+      index = i===len-1 ? 0 : i+1
+      break
+    }
+  }
+  this.ML[index].prev_next = true
+  this.play(this.ML[index])
+}
+
+ended() { // 当前的歌曲播放完毕检测是否循环
+  if(this.LOOP === false) { // 当设定的不是循环时
+    this.next()
+  }
+},
+```
+
