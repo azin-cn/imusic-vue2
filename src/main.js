@@ -2,30 +2,19 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
-import VueLazyload from 'vue-lazyload'
 
 Vue.config.productionTip = false;
 
 import 'assets/css/base.css'
 
-
-String.prototype.trim=function(){undefined
-  return this.replace(/(^\s*)|(\s*$)/g, "");
-}
-String.prototype.ltrim=function(){undefined
-  return this.replace(/(^\s*)/g,"");
-}
-String.prototype.rtrim=function(){undefined
-  return this.replace(/(\s*$)/g,"");
-}
-
-
-
-// import 'assets/icon/discover/iconfont.css'
+import VueLazyload from 'vue-lazyload'
 Vue.use(VueLazyload)
+
+import toast from 'components/common/toast';
+Vue.use(toast) // 注册组件默认调用的是install方法
 
 new Vue({
   router,
   store,
-  render: h => h(App)
+  render: h => h(App) // render函数更加的高效，不用经过模板编译的过程
 }).$mount('#app')

@@ -12,7 +12,6 @@
 </template>
 
 <script>
-
 import NavBar from "components/content/main_nav/MainNav";
 import PlayTabBar from 'components/content/play_tab_bar/PlayTabBar'
 import MAudio from 'components/content/audio/MAudio'

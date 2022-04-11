@@ -1,3 +1,4 @@
+import Vue from 'vue'
 
 import {
   REC_DISCOVERD_DATA,
@@ -162,7 +163,12 @@ export const actions = {
     resp = await reqMusicUrl(id)
     if(resp.code !== 200 || resp.data[0].url === null) {
       console.log('actions url获取失败');
-      // 进行提示，检查版权，或者检查音乐版权
+      // 进行提示，检查版权
+      reqCheckMusic(id).catch(err => {
+        let msg = err.data.message
+        Vue.prototype.$toast.show(msg)
+        console.log(err.data);
+      })
     }else {
       src = resp.data[0].url
     }
