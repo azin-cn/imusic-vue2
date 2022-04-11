@@ -57,6 +57,10 @@
 <script>
 
 import {throttle} from 'components/common/debounce/debounce'
+
+/** utils area */
+import {getProxyEventAttr} from 'utils/getProxyEventAttr'
+
 import {
   reqSearchDefault,
   reqSearchSuggest
@@ -134,29 +138,19 @@ export default {
       this.allMatch = resp.result.allMatch
     },800),
     htClick(e) {
-      let target = e.target
-      while(target) { // 如果target不为空或者是undefined
-        let attr = 'data-history-item-val'
-        if(target.hasAttribute && target.hasAttribute(attr)) {
-          let keywords = target.getAttribute(attr)
-          this.keywords = keywords
-          this.toSearchDetail()
-          return ;
-        }
-        target = target.parentNode
+      let attr = 'data-history-item-val'
+      let keywords = getProxyEventAttr(e,attr)
+      if(keywords) {
+        this.keywords = keywords
+        this.toSearchDetail()
       }
     },
     recomClick(e) {
-      let target = e.target
       let attr = 'data-recom-match-keyword'
-      while(target) {
-        if(target.hasAttribute && target.hasAttribute(attr)) {
-          let keywords = target.getAttribute(attr)
-          this.keywords = keywords
-          this.toSearchDetail()
-          return ;
-        }
-        target = target.parentNode
+      let keywords = getProxyEventAttr(e,attr)
+      if(keywords) {
+        this.keywords = keywords
+        this.toSearchDetail()
       }
     },
     toSearchDetail() {

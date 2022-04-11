@@ -1,12 +1,12 @@
 <template>
   <div id="app">
-    <nav-bar v-show="nav_tab_display"></nav-bar>
+    <nav-bar v-show="nav_tab_display.nav"></nav-bar>
     <transition :name="transitionName">
       <keep-alive exclude="{}">
         <router-view/>
       </keep-alive>
     </transition>
-    <play-tab-bar v-show="nav_tab_display"></play-tab-bar>
+    <play-tab-bar v-show="nav_tab_display.tab"></play-tab-bar>
     <m-audio></m-audio>
   </div>
 </template>
@@ -30,9 +30,15 @@ export default {
   },
   computed: {
     nav_tab_display() {
-      let path = this.$route.path.toLowerCase()
+      //注意：不是第一个，而是第二个才是路由
+      let path = this.$route.path.toLowerCase().split("/")[1]
       // console.log(/\/player.+/.test(path))
-      return !path.includes('/musicplayer')
+      let unableSet = new Set(['musicplayer','search'])
+      console.log("to",path);
+      return {
+        nav: !unableSet.has(path),
+        tab: !path.includes('musicplayer')
+      }
     }
   },
   /**
@@ -62,7 +68,7 @@ export default {
 </script>
 
 <style lang="less">
-@import url('https://at.alicdn.com/t/font_3280963_08bztkn4no6b.css');
+@import url('https://at.alicdn.com/t/font_3280963_l0j0xgmhz3q.css');
 
 *[class$='-leave-to']{
   display: none; // 防止抖动

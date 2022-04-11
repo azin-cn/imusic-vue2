@@ -16,7 +16,7 @@
     </div>
 
     <!-- 右侧 -->
-    <div slot="right">
+    <div slot="right" @click="search">
       <span class="iconfont icon-sousuo"></span>
     </div>
   </nav-bar>
@@ -45,6 +45,9 @@ export default {
       this.currentIndex = index  // 使用的是RefImpl函数实例
       this.changeRoute(this.routes[index])
     },
+    search() {
+      this.$router.push('/search')
+    }
   }
 }
 </script>

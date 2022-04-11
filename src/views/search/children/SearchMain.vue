@@ -48,6 +48,8 @@ export default {
     changeIndex(e) {
       let attr = 'data-search-body-title-index'
       let val = getProxyEventAttr(e,attr)
+      console.log(val);
+      this.currentIndex = val ? val : this.currentIndex
     }
   }
 
