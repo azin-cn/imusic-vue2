@@ -243,7 +243,7 @@ export default {
 }
 
 .play-tab-bar-music-list {
-  transform: translateY(-90vh);
+  transform: translateY(-91vh);
 }
 
 
@@ -259,7 +259,7 @@ export default {
 .slide-up-down-leave,.slide-up-down-enter-to {
   // slide-up slide-down
   opacity: 1;
-  transform: translateY(-90vh);
+  transform: translateY(-91vh);
 }
 
 </style>

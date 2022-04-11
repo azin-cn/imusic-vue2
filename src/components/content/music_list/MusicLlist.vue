@@ -29,6 +29,9 @@
           </music-item>
           <span v-if="isEmpty">还未有歌曲哦~ | 在一瞬间~</span>
         </div>
+        <div class="bear">
+
+        </div>
       </div>
 
     </div>
@@ -156,6 +159,7 @@ export default {
   height: 408px;
   background-color: #fff;
   border-radius: 12px 12px 12px 12px;
+  box-shadow: 0 0 8px 4px rgba(131, 131, 131, .3);
 }
 .music-list-head {
   display: flex;
