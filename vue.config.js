@@ -10,6 +10,7 @@ module.exports = defineConfig({
         'assets': '@/assets',
         'components': '@/components',
         'views': '@/views',
+        'utils': '@/utils'
       }
     }
   },
@@ -22,11 +23,4 @@ module.exports = defineConfig({
       }
     }
   },
-
-  pluginOptions: {
-    'cube-ui': {
-      postCompile: false,
-      theme: false
-    }
-  }
 })
